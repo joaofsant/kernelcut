@@ -1,0 +1,56 @@
+name: kernelcut-daily
+
+on:
+  schedule:
+    - cron: '15 05 * * *'   # corre 05:15 UTC
+  workflow_dispatch: {}      # botão "Run workflow"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas requests fastparquet feedparser pytest
+      - name: Ingest
+        run: python ingest.py
+      - name: Tests
+        run: pytest -q
+      - name: Transform
+        run: python transform.py
+      - name: Quality
+        run: python quality.py
+      - name: Storage
+        run: python storage.py
+      - name: Build digest (HTML + MD)
+        run: python digest.py
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
