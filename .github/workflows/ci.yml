@@ -2,8 +2,8 @@ name: kernelcut-daily
 
 on:
   schedule:
-    - cron: '15 05 * * *'   # corre 05:15 UTC
-  workflow_dispatch: {}      # botão "Run workflow"
+    - cron: '15 08 * * *'   
+  workflow_dispatch: {}      "
 
 permissions:
   contents: read
