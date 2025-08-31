@@ -38,7 +38,7 @@ jobs:
         run: pytest -q
 
       - name: Transform
-        run: python transform.py  
+        run: python transform.py --window today  
 
       - name: Quality
         run: python quality.py

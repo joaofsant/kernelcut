@@ -8,6 +8,18 @@ import hashlib
 
 PROC = Path("data/processed")
 DOCS = Path("docs"); DOCS.mkdir(parents=True, exist_ok=True)
+SEEN_FILE = DOCS / ".seen_links.txt"
+SEEN_LIMIT = 300
+
+def load_seen() -> set[str]:
+    if not SEEN_FILE.exists():
+        return set()
+    return set(x.strip() for x in SEEN_FILE.read_text().splitlines() if x.strip())
+
+def save_seen(links: list[str]):
+    prev = list(load_seen())
+    new = prev + links
+    SEEN_FILE.write_text("\n".join(new[-SEEN_LIMIT:]), encoding="utf-8")
 
 def find_parquet() -> Path:
     parts = sorted(PROC.glob("date=*/kernelcut.parquet"))
@@ -93,12 +105,20 @@ def build_digest():
 
     now = datetime.now(timezone.utc)
     today = now.strftime("%b %d, %Y")
-    last_run = now.strftime("%Y-%m-%d %H:%M UTC")
 
+    # avoid repeating links across runs (recent memory)
+    seen = load_seen()
+    if "link" in df.columns:
+        df = df[~df["link"].isin(seen)].copy()
+
+    # tie-break with deterministic jitter that changes hourly
     seed = int(now.strftime("%Y%m%d%H"))
     df["jitter"] = df["title"].astype(str).apply(lambda s: seeded_jitter(s, seed))
+
+    # prefer higher score first, then jitter
     df = df.sort_values(["score", "jitter"], ascending=[False, False], ignore_index=True)
 
+    # diversity by source
     cap_per_source = 4
     used_per_source, picks = {}, []
     for _, row in df.iterrows():
@@ -110,6 +130,7 @@ def build_digest():
         if len(picks) >= 12:
             break
 
+    # pick unique emojis once and reuse for MD + HTML
     used_emojis: set = set()
     chosen = []
     for row in picks:
@@ -118,8 +139,11 @@ def build_digest():
         emoji = pick_emoji_unique(title, domain, used_emojis)
         chosen.append(emoji)
 
+    # persist seen links
+    save_seen([row.get("link", "") for row in picks if isinstance(row.get("link"), str)])
+
     # Markdown
-    md_lines = [f"# Kernelcut\n**Daily Tech Digest — {today} · Last updated: {last_run}**\n"]
+    md_lines = [f"# Kernelcut\n**Daily Tech Digest — {today}**\n"]
     for row, emoji in zip(picks, chosen):
         link = row["link"]; title = row["title"] or "n/a"
         domain = row.get("domain","unknown")
@@ -182,7 +206,7 @@ def build_digest():
 <body>
   <main class="page">
     <h1>Kernelcut</h1>
-    <p class="subtitle"><strong>Daily Tech Digest</strong> — {today} · <span style="color:var(--muted)">Last updated: {last_run}</span></p>
+    <p class="subtitle"><strong>Daily Tech Digest</strong> — {today}</p>
     {''.join(cards)}
     <footer>Kernelcut slices the noise; keeps the signal.</footer>
   </main>

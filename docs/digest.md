@@ -1,22 +1,30 @@
 # Kernelcut
-**Daily Tech Digest — Aug 31, 2025 · Last updated: 2025-08-31 12:43 UTC**
+**Daily Tech Digest — Aug 31, 2025 · Last updated: 2025-08-31 12:54 UTC**
 
-- 🤖 [Showrunner wants to turn you into a happy little content prompter for the &#8216;Netflix of AI&#8217;](https://www.theverge.com/ai-artificial-intelligence/762594/fable-showrunner-edwatch-saatchi-interview) — _www.theverge.com_
-  - As one of the cofounders behind Oculus Story Studio, Edward Saatchi knows how hard it can be to sell people on new tech that bills itself as revolutionary. Even though Story Studio snagged an Emmy for one of its three animated features, a…
-- 💻 [Framework actually did it: I upgraded a laptop’s entire GPU in just three minutes](https://www.theverge.com/report/768083/framework-actually-did-it-i-upgraded-a-laptops-entire-gpu-in-just-three-minutes) — _www.theverge.com_
-  - On Tuesday, I told you how the modular computer company Framework was finally fulfilling its promise of the "holy grail for gamers" - a laptop with modular, swappable discrete graphics cards so easy to swap, practically anyone can do it at…
-- 🚀 [The future of AI hardware isn&#8217;t one device — it&#8217;s an entire ecosystem](https://www.theverge.com/report/767765/ai-hardware-google-pixel-gemini-wearables-ambient-computing) — _www.theverge.com_
-  - I dream of a gadget that can do it all. Instead, when I leave for the office, I pack one or two phones, a portable battery bank, a laptop, a Kindle, a new product I'm testing, and at least one pair of earbuds. In my backpack, there's a pou…
-- ✨ [Microsoft’s next annual update for Windows 11 is in Release Preview testing](https://www.theverge.com/microsoft-windows/768227/windows-11-25h2-release-preview-test) — _www.theverge.com_
-  - The schedule of annual updates for Windows 11 that arrive in the second half of the year will hold steady for 2025, and today, Microsoft announced that the 25H2 package is available now for testing in the Release Preview Channel. So, will…
-- 🧠 [F-Stack – A network development kit with high performance based on DPDK](https://www.f-stack.org/) — _www.f-stack.org_
-  - Points: 33 # Comments: 2
-- 🛠️ [Nokia’s legendary font makes for a great user interface font](https://www.osnews.com/story/143222/it-turns-out-nokias-legendary-font-makes-for-a-great-general-user-interface-font/) — _www.osnews.com_
-  - Points: 78 # Comments: 30
-- ⚙️ [AI models need a virtual machine](https://blog.sigplan.org/2025/08/29/ai-models-need-a-virtual-machine/) — _blog.sigplan.org_
-  - Points: 21 # Comments: 0
-- 🧩 [Cognitive Load is what matters](https://github.com/zakirullin/cognitive-load) — _github.com_
-  - Points: 61 # Comments: 6
+- 🤖 [GitLab Unveils Duo Agent Platform in Public Beta, Introducing Agent-Orchestrated DevSecOps](https://www.infoq.com/news/2025/08/gitlab-duo-agent-platform/?utm_campaign=infoq_content&utm_source=infoq&utm_medium=feed&utm_term=global) — _www.infoq.com_
+  - GitLab has launched the public beta of its GitLab Duo Agent Platform, an orchestration tool that enables developers to collaborate asynchronously with AI agents across the DevSecOps lifecycle. By Craig Risi
+- 🔐 [Pogocache: Open Source Caching Software with Low Latency and Multiple Wire Protocols](https://www.infoq.com/news/2025/08/pogocache-caching/?utm_campaign=infoq_content&utm_source=infoq&utm_medium=feed&utm_term=global) — _www.infoq.com_
+  - A new open-source caching software, Pogocache, recently reached 1.0 general availability, focusing on low latency and CPU efficiency. Pogocache supports multiple popular protocols while claiming better throughput and lower latency than oth…
+- ✨ [Big Tech Companies in the US Have Been Told Not to Apply the Digital Services Act](https://www.wired.com/story/big-tech-companies-in-the-us-have-been-told-not-to-apply-the-digital-services-act/) — _www.wired.com_
+  - The FTC notified companies like Google, Meta, and Apple that they must not apply the Digital Services Act, which regulates digital platforms, if it jeopardizes the freedom of Americans.
+- 🚀 [AI agents are science fiction not yet ready for primetime](https://www.theverge.com/the-stepback-newsletter/767376/ai-agents-jarvis-what-can-they-do) — _www.theverge.com_
+  - This is The Stepback, a weekly newsletter breaking down one essential story from the tech world. For more on all things AI, follow Hayden Field. The Stepback arrives in our subscribers' inboxes at 8AM ET. Opt in for The Stepback here. How…
+- 🧠 [These Hi-Fi Speakers Are Made out of Rocket Fuel Tanks](https://www.wired.com/story/debris-hi-fi-speakers-are-made-out-of-rocket-fuel-tanks/) — _www.wired.com_
+  - The &Space Project upcycles waste materials from space development. Now it has designed Debris, a set of speakers using test fuel tanks from commercial rockets.
+- 🛠️ [Channel3 (YC S25) Is Hiring a Founding Engineer, NYC](https://channel3.notion.site/founding-engineer) — _channel3.notion.site_
+  - Points: 0 # Comments: 0
+- ⚙️ [OpenAI is testing "Thinking effort" for ChatGPT](https://www.bleepingcomputer.com/news/artificial-intelligence/openai-is-testing-thinking-effort-for-chatgpt/) — _www.bleepingcomputer.com_
+  - OpenAI is working on a new feature called the Thinking effort picker for ChatGPT. [...]
+- 🔧 [These Newly Discovered Cells Breathe in Two Ways](https://www.wired.com/story/these-newly-discovered-cells-breathe-in-two-ways/) — _www.wired.com_
+  - In a hot spring at Yellowstone National Park, a microbe does something that life shouldn’t be able to: It breathes oxygen and sulfur at the same time.
+- 🔬 [Historians See Autocratic Playbook in Trump’s Attacks on Science](https://www.nytimes.com/2025/08/31/science/trump-science-autocrats.html) — _www.nytimes.com_
+  - Authoritarians have long feared and suppressed science as a rival for social influence. Experts see President Trump as borrowing some of their tactics.
+- 🛰️ [Show HN: Banana AI – Completely free Nano Banana image editing](https://banana-ai.org/) — _banana-ai.org_
+  - Points: 3 # Comments: 0
+- 📰 [How Builder.ai Collapsed Amid Silicon Valley’s Biggest Boom](https://www.nytimes.com/2025/08/31/technology/builder-ai-collapse.html) — _www.nytimes.com_
+  - Builder.ai went from a value of $1.5 billion to zero in a few months, amid questions over the sales of an A.I. product. Its downfall hints at a broader downturn.
+- 🧪 [How ‘Clanker’ Became an Anti-A.I. Rallying Cry](https://www.nytimes.com/2025/08/31/technology/clanker-anti-ai.html) — _www.nytimes.com_
+  - The term, which was popularized by a “Star Wars” show and is rooted in real frustrations with technology, has become a go-to slur against artificial intelligence and robots.
 
 ---
 *Kernelcut slices the noise; keeps the signal.*
