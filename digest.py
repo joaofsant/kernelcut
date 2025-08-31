@@ -1,9 +1,10 @@
 # digest.py
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 import re
 from html import unescape
+import hashlib
 
 PROC = Path("data/processed")
 DOCS = Path("docs"); DOCS.mkdir(parents=True, exist_ok=True)
@@ -32,7 +33,6 @@ def short(s: str, limit: int = 220) -> str:
     s = (s or "").strip()
     return s if len(s) <= limit else s[: limit - 1].rstrip() + "…"
 
-# categorias -> palavras-chave
 KEYWORDS = {
     "ai": ["ai","artificial intelligence","gpt","llm","openai","deepmind","transformer","agent"],
     "dev": ["developer","sdk","api","framework","library","runtime","debug","compiler","devops","docker","kubernetes"],
@@ -48,7 +48,6 @@ KEYWORDS = {
     "social": ["twitter","x.com","facebook","instagram","tiktok","reddit"],
 }
 
-# emoji preferido por categoria
 EMOJIS = {
     "ai": "🤖", "dev": "💻", "security": "🔐", "research": "📄",
     "hardware": "🖥️", "data": "📊", "cloud": "☁️", "mobile": "📱",
@@ -56,7 +55,6 @@ EMOJIS = {
     "default": "✨",
 }
 
-# pool de backup (para não repetir no mesmo dia)
 EMOJI_POOL = [
     "🚀","🧠","🛠️","⚙️","🔧","🔬","🛰️","📰","🧪","🧵","🧱","🪄","🧭","🪐","🧰",
     "🧮","📦","📈","📡","🔗","🪫","🔋","🧬","🧑‍💻"
@@ -72,30 +70,39 @@ def category_for(text: str) -> str:
     return "default"
 
 def pick_emoji_unique(title: str, domain: str, used: set) -> str:
-    
+    """Pick a unique emoji for each item in the digest."""
     cat = category_for(f"{title} {domain}")
     primary = EMOJIS.get(cat, EMOJIS["default"])
     if primary not in used:
         used.add(primary)
         return primary
-    
     for e in EMOJI_POOL:
         if e not in used:
             used.add(e)
             return e
-    
     return primary
+
+def seeded_jitter(text: str, seed: int) -> float:
+    """Deterministic jitter [0,1) based on text + hourly seed, to break ties."""
+    h = hashlib.md5(f"{seed}|{text}".encode()).hexdigest()
+    return (int(h[:8], 16) % 1_000_000) / 1_000_000.0
 
 def build_digest():
     pf = find_parquet()
     df = pd.read_parquet(pf, engine="fastparquet")
-    today = datetime.utcnow().strftime("%b %d, %Y")
 
-    df = df.sort_values("score", ascending=False, ignore_index=True)
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%b %d, %Y")
+    last_run = now.strftime("%Y-%m-%d %H:%M UTC")
+
+    seed = int(now.strftime("%Y%m%d%H"))
+    df["jitter"] = df["title"].astype(str).apply(lambda s: seeded_jitter(s, seed))
+    df = df.sort_values(["score", "jitter"], ascending=[False, False], ignore_index=True)
+
     cap_per_source = 4
     used_per_source, picks = {}, []
     for _, row in df.iterrows():
-        src = row.get("source","Unknown")
+        src = row.get("source", "Unknown")
         if used_per_source.get(src, 0) >= cap_per_source:
             continue
         picks.append(row)
@@ -104,14 +111,19 @@ def build_digest():
             break
 
     used_emojis: set = set()
+    chosen = []
+    for row in picks:
+        title = row.get("title") or "n/a"
+        domain = row.get("domain", "unknown")
+        emoji = pick_emoji_unique(title, domain, used_emojis)
+        chosen.append(emoji)
 
     # Markdown
-    md_lines = [f"# Kernelcut\n**Daily Tech Digest — {today}**\n"]
-    for row in picks:
+    md_lines = [f"# Kernelcut\n**Daily Tech Digest — {today} · Last updated: {last_run}**\n"]
+    for row, emoji in zip(picks, chosen):
         link = row["link"]; title = row["title"] or "n/a"
         domain = row.get("domain","unknown")
         summary = short(strip_html(row.get("summary","")), 240)
-        emoji = pick_emoji_unique(title, domain, used_emojis)
         md_lines.append(f"- {emoji} [{title}]({link}) — _{domain}_")
         if summary:
             md_lines.append(f"  - {summary}")
@@ -120,11 +132,10 @@ def build_digest():
 
     # HTML
     cards = []
-    for row in picks:
+    for row, emoji in zip(picks, chosen):
         link = row["link"]; title = row["title"] or "n/a"
         domain = row.get("domain","unknown")
         summary = short(strip_html(row.get("summary","")), 260)
-        emoji = pick_emoji_unique(title, domain, used_emojis)  # mesmo conjunto para evitar repetir
         cards.append(f"""
         <div class="card">
           <a class="title" href="{link}" target="_blank" rel="noopener noreferrer">{emoji} {title}</a>
@@ -171,7 +182,7 @@ def build_digest():
 <body>
   <main class="page">
     <h1>Kernelcut</h1>
-    <p class="subtitle"><strong>Daily Tech Digest</strong> — {today}</p>
+    <p class="subtitle"><strong>Daily Tech Digest</strong> — {today} · <span style="color:var(--muted)">Last updated: {last_run}</span></p>
     {''.join(cards)}
     <footer>Kernelcut slices the noise; keeps the signal.</footer>
   </main>
