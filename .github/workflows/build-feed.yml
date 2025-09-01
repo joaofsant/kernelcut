@@ -1,0 +1,53 @@
+name: pages: publish new UI + fresh playlist.json to docs/
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'index.html'
+      - 'scripts/**'
+      - '.github/workflows/build-feed.yml'
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 minutes (optional)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps (if any)
+        run: npm ci || npm i
+
+      - name: Build feed
+        run: node scripts/buildFeed.mjs
+
+      - name: Prepare docs
+        run: |
+          mkdir -p docs
+          cp -f index.html docs/index.html
+          cp -f playlist.json docs/playlist.json
+
+      - name: Commit & push docs if changed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! git diff --quiet -- docs/index.html docs/playlist.json; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/index.html docs/playlist.json
+            git commit -m "pages: publish new UI + fresh playlist.json to docs/"
+            git push
+          else
+            echo "No changes to publish."
+          fi
