@@ -25,11 +25,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install pandas requests fastparquet feedparser httpx pytest
+          pip install pandas requests fastparquet feedparser httpx gTTS trafilatura pydub pytest
 
       - name: Ingest
         run: python ingest.py
@@ -48,6 +50,9 @@ jobs:
 
       - name: Build digest (HTML + MD)
         run: python digest.py
+
+      - name: Build audio (stories + playlist)
+        run: python speak.py --mode full --lang en
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

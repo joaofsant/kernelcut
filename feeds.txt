@@ -1,34 +1,43 @@
-https://hnrss.org/frontpage
-https://hnrss.org/best
-https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
-https://feeds.arstechnica.com/arstechnica/technology-lab
+# —— Tech news (general)
 https://www.theverge.com/rss/index.xml
+https://arstechnica.com/feed/
 https://www.wired.com/feed/rss
-https://www.technologyreview.com/feed/
-https://www.semafor.com/tech/feed.xml
-https://www.theinformation.com/feed
-https://stratechery.com/feed/
-https://a16z.com/feed/
-https://blog.google/technology/rss/
-https://aws.amazon.com/blogs/machine-learning/feed/
-https://cloud.google.com/blog/topics/ai-ml/rss/
-https://openai.com/blog/rss.xml
-https://deepmind.google/discover/blog.rss
-https://ai.googleblog.com/feeds/posts/default
-https://engineering.fb.com/feed/
-https://dropbox.tech/feed/
-https://slack.engineering/feed/
-https://netflixtechblog.com/feed
-https://discord.com/blog/rss.xml
-https://open.nytimes.com/feed
-https://github.blog/feed/
-https://aws.amazon.com/blogs/opensource/feed/
-https://about.fb.com/news/tech/feed/
-https://krebsonsecurity.com/feed/
-https://www.schneier.com/feed/atom/
-https://www.bleepingcomputer.com/feed/
-https://www.darkreading.com/rss.xml
-https://www.csoonline.com/index.rss
-https://www.infoq.com/feed/
+https://techcrunch.com/feed/
+https://www.engadget.com/rss.xml
+https://www.bbc.co.uk/news/technology/rss.xml
+https://www.theguardian.com/technology/rss
+https://www.theverge.com/tech/rss/index.xml
+
+# —— Engineering / Cloud
+https://aws.amazon.com/blogs/aws/feed/
+https://cloud.google.com/blog/topics/developers-practitioners/rss.xml
+https://azure.microsoft.com/en-us/blog/feed/
+https://kubernetes.io/feed.xml
 https://martinfowler.com/feed.atom
-https://news.ycombinator.com/rss
+https://stackoverflow.blog/feed/
+
+# —— Data / Infra
+https://netflixtechblog.com/feed
+https://dropbox.tech/feed
+https://medium.com/feed/airbnb-engineering
+https://databricks.com/blog/feed
+https://clickhouse.com/blog/rss.xml
+https://duckdb.org/news.rss
+
+# —— AI / Research
+https://ai.googleblog.com/feeds/posts/default?alt=rss
+https://deepmind.google/discover/blog/rss/
+https://openai.com/blog/rss/   # se não funcionar, comenta
+https://arxiv.org/rss/cs.LG
+https://arxiv.org/rss/cs.AI
+https://www.nature.com/subjects/artificial-intelligence/rss.xml
+https://www.technologyreview.com/feed/
+
+# —— Security
+https://krebsonsecurity.com/feed/
+https://www.bleepingcomputer.com/feed/
+https://portswigger.net/daily-swig/rss
+https://blog.cloudflare.com/rss/
+
+# —— Curadoria social
+https://hnrss.org/frontpage

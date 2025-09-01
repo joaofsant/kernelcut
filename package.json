@@ -1,0 +1,13 @@
+{
+  "name": "kernelcut",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build:feed": "node scripts/buildFeed.mjs"
+  },
+  "dependencies": {
+    "rss-parser": "^3.13.0",
+    "html-to-text": "^9.0.5"
+  }
+}

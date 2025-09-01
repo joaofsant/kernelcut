@@ -1,13 +1,18 @@
 # transform.py
 from pathlib import Path
-import json
-import os
-import argparse
+import json, re
 import pandas as pd
-from datetime import datetime, timezone, timedelta
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
 RAW_DIR = Path("data/raw")
+
+GOOD_DOMAINS = {
+    "www.theverge.com","arstechnica.com","techcrunch.com","www.wired.com",
+    "www.nature.com","arxiv.org","spectrum.ieee.org","ai.googleblog.com",
+    "openai.com","deepmind.google","www.semanticscholar.org"
+}
+BLOCK_TITLE = re.compile(r"(?i)^(show\s*hn|ask\s*hn|who\s*is\s*hiring|launch\s*hn)\b")
+CLEAN_TITLE = re.compile(r"(?i)^(show\s*hn|ask\s*hn|launch\s*hn)\s*[:\-]\s*")
 
 def latest_raw() -> Path:
     files = sorted(RAW_DIR.glob("kernelcut_*.json"))
@@ -15,84 +20,77 @@ def latest_raw() -> Path:
         raise SystemExit("No raw files. Run: python ingest.py")
     return files[-1]
 
-def build_filter_mask(df: pd.DataFrame, window: str) -> pd.Series:
-    now = datetime.now(timezone.utc)
-    if window == "today":
-        start = datetime(now.year, now.month, now.day, tzinfo=timezone.utc)
-        end = start + timedelta(days=1)
-        return (df["published"] >= start) & (df["published"] < end)
-    # default: last 24h
-    cutoff = now - timedelta(days=1)
-    return df["published"] >= cutoff
+def normalize_link(u: str) -> str:
+    try:
+        p = urlparse(u)
+        # drop tracking query params
+        q = [(k,v) for k,v in parse_qsl(p.query, keep_blank_values=True)
+             if not re.match(r"^(utm_|ref$|ref_src$|ncid$|fbclid$)", k, re.I)]
+        p = p._replace(query=urlencode(q, doseq=True))
+        # drop fragments
+        p = p._replace(fragment="")
+        return urlunparse(p)
+    except Exception:
+        return u or ""
 
-def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Kernelcut transform")
-    p.add_argument(
-        "--window",
-        choices=["24h", "today"],
-        default=os.getenv("KERNELCUT_WINDOW", "24h"),
-        help="Time filter: last 24h (default) or 'today' (UTC)",
-    )
-    return p.parse_args()
-
-def transform(window: str = None) -> pd.DataFrame:
-    if window is None:
-        window = os.getenv("KERNELCUT_WINDOW", "24h")
-
-    path = latest_raw()
+def load_df(path: Path) -> pd.DataFrame:
     rows = json.loads(path.read_text())
     df = pd.DataFrame(rows)
+    for c in ("title","summary","link","source","published"):
+        if c not in df.columns: df[c] = None
+    df["title"] = df["title"].fillna("").astype(str).str.strip()
+    df["title"] = df["title"].str.replace(r"\s+", " ", regex=True)
+    df["title_norm"] = df["title"].str.lower().str.replace(r"[^\w\s]", "", regex=True).str.strip()
+    df["title"] = df["title"].str.replace(CLEAN_TITLE, "", regex=True).str.strip()
 
-    # fetch_ts from filename (UTC)
+    df["link"] = df["link"].fillna("").astype(str).str.strip()
+    df["link_norm"] = df["link"].apply(normalize_link)
+
+    df["source"] = df["source"].fillna("Unknown").astype(str).str.strip()
+    df["published"] = pd.to_datetime(df["published"], errors="coerce", utc=True)
+
+    from urllib.parse import urlparse as up
+    df["domain"] = df["link_norm"].apply(lambda u: up(u).netloc if u else "")
+    return df
+
+def score(df: pd.DataFrame) -> pd.Series:
+    now = pd.Timestamp.now(tz="UTC")
+    pub = df["published"].fillna(now)
+    rec = (pub.astype("int64", copy=False) / 1e9)
+    rec = (rec - rec.min()) / (rec.max() - rec.min() + 1e-9)
+
+    tlen = df["title"].str.len().clip(lower=1)
+    tlen = tlen / (tlen.max() or 1)
+
+    bonus = df["domain"].isin(GOOD_DOMAINS).astype(float) * 0.20
+    penalty = df["title"].str.match(BLOCK_TITLE).astype(float) * 0.40
+
+    return (0.55*rec + 0.30*tlen + bonus - penalty).clip(lower=0, upper=1)
+
+def transform(window: str | None = None) -> pd.DataFrame:
+    path = latest_raw()
+    df = load_df(path)
+
+    # window filter
+    if window:
+        now = pd.Timestamp.now(tz="UTC")
+        start = now.floor("D") if window == "today" else (now - pd.Timedelta(hours=24))
+        recent = df["published"].ge(start)
+        df = pd.concat([df[recent], df[df["published"].isna()]], ignore_index=True)
+
+    # dedupe: link first, then title
+    df = df.sort_values("published", ascending=False)
+    df = df.drop_duplicates(subset=["link_norm"], keep="first")
+    df = df.drop_duplicates(subset=["title_norm"], keep="first")
+
     ts = path.stem.replace("kernelcut_", "")
-    fetch_ts = pd.to_datetime(ts, format="%Y%m%dT%H%M%SZ", utc=True)
-    df["fetch_ts"] = fetch_ts
+    df["fetch_ts"] = pd.to_datetime(ts, format="%Y%m%dT%H%M%SZ", utc=True)
 
-    # published (UTC) with fallback to fetch_ts
-    df["published"] = pd.to_datetime(df.get("published"), errors="coerce", utc=True)
-    df["published"] = df["published"].fillna(df["fetch_ts"])
+    df["score"] = score(df)
+    df = df.sort_values("score", ascending=False).reset_index(drop=True)
 
-    # text cleanup
-    df["title"] = df.get("title", "").fillna("n/a").astype(str).str.strip()
-    df["summary"] = df.get("summary", "").fillna("").astype(str).str.strip()
-
-    # link/domain
-    df["link"] = df.get("link").astype(str)
-    df["domain"] = df["link"].apply(lambda u: urlparse(u).netloc if isinstance(u, str) and u else None)
-
-    # --- time window filter ---
-    mask = build_filter_mask(df, window)
-    df = df[mask].copy()
-    if df.empty:
-        raise SystemExit(f"No items for window='{window}' (UTC). Try later or add more sources.")
-
-    # --- de-dup (prefer newest) ---
-    df = df.sort_values(["published"], ascending=False)
-    df = df.drop_duplicates(subset=["link"], keep="first")
-    df = df.drop_duplicates(subset=["title"], keep="first")
-
-    # --- ranking: recency vs title length ---
-    if window == "today":
-        # relative to start-of-day for stability
-        now = datetime.now(timezone.utc)
-        start = datetime(now.year, now.month, now.day, tzinfo=timezone.utc)
-        recency_sec = (df["published"] - start).dt.total_seconds().clip(lower=0)
-    else:
-        cutoff = datetime.now(timezone.utc) - timedelta(days=1)
-        recency_sec = (df["published"] - cutoff).dt.total_seconds().clip(lower=0)
-
-    rec_norm = recency_sec / recency_sec.max() if recency_sec.max() > 0 else 0
-    title_len = df["title"].str.len().clip(lower=1)
-    tlen_norm = title_len / title_len.max()
-
-    df["score"] = rec_norm * 0.7 + tlen_norm * 0.3
-
-    cols = ["source", "title", "link", "domain", "summary", "published", "fetch_ts", "score"]
-    extra = [c for c in df.columns if c not in cols]
-    return df[cols + extra].reset_index(drop=True)
+    # mantém um top razoável
+    return df.head(200)
 
 if __name__ == "__main__":
-    args = parse_args()
-    out = transform(window=args.window)
-    print(out.head(5))
-    print(f"Rows ({args.window} UTC): {len(out)}")
+    print(transform("today").head(12)[["title","domain","score"]])
