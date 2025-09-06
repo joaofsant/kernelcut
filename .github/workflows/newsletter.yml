@@ -1,24 +1,138 @@
-name: Send daily newsletter (06:00 UTC)
+name: newsletter
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # every day at 06:00 UTC
-  workflow_dispatch: {}
+    - cron: '0 6 * * *'   # every day at 06:00 UTC
+  workflow_dispatch:      # allow manual test runs
 
 jobs:
   send:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
-      - run: npm ci || npm i
-      - run: node scripts/buildFeed.mjs
-      - name: Send newsletter via Brevo
-        run: node scripts/sendBrevo.mjs
+          node-version: '20'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build feed (safety; regenerates docs/playlist.json)
+        run: node scripts/buildFeed.mjs
+
+      - name: Send daily digest via Brevo (to list)
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
-          BREVO_SENDER_NAME: ${{ secrets.BREVO_SENDER_NAME }}
-          BREVO_SENDER_EMAIL: ${{ secrets.BREVO_SENDER_EMAIL }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const https = require('https');
+
+          const API_KEY = process.env.BREVO_API_KEY;
+          const LIST_ID = Number(process.env.BREVO_LIST_ID || 0);
+          if (!API_KEY) { console.error('Missing BREVO_API_KEY secret'); process.exit(1); }
+          if (!LIST_ID) { console.error('Missing BREVO_LIST_ID secret'); process.exit(1); }
+
+          function brevoGet(path) {
+            return new Promise((resolve, reject) => {
+              const req = https.request({
+                method: 'GET',
+                hostname: 'api.brevo.com',
+                path,
+                headers: { 'accept': 'application/json', 'api-key': API_KEY }
+              }, res => {
+                let data = '';
+                res.on('data', c => data += c);
+                res.on('end', () => {
+                  if (res.statusCode >= 300) return reject(new Error(`GET ${path}: ${res.statusCode} ${data}`));
+                  try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+                });
+              });
+              req.on('error', reject); req.end();
+            });
+          }
+
+          function brevoPost(path, body) {
+            const payload = JSON.stringify(body);
+            return new Promise((resolve, reject) => {
+              const req = https.request({
+                method: 'POST',
+                hostname: 'api.brevo.com',
+                path,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'api-key': API_KEY,
+                  'Content-Length': Buffer.byteLength(payload)
+                }
+              }, res => {
+                let data = '';
+                res.on('data', c => data += c);
+                res.on('end', () => {
+                  if (res.statusCode >= 300) return reject(new Error(`POST ${path}: ${res.statusCode} ${data}`));
+                  resolve(data);
+                });
+              });
+              req.on('error', reject);
+              req.write(payload); req.end();
+            });
+          }
+
+          // 1) Load curated items
+          const items = JSON.parse(fs.readFileSync('docs/playlist.json', 'utf8'));
+          const today = new Date().toISOString().slice(0,10);
+
+          // 2) Fetch all contacts from the list (paginate)
+          async function getAllEmails(listId) {
+            const limit = 500;
+            let offset = 0, emails = [];
+            while (true) {
+              const res = await brevoGet(`/v3/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`);
+              const page = (res.contacts || []).map(c => c.email).filter(Boolean);
+              emails.push(...page);
+              if (page.length < limit) break;
+              offset += limit;
+            }
+            // de-dup & basic sanity
+            return [...new Set(emails.map(e => String(e).trim().toLowerCase()))];
+          }
+
+          (async () => {
+            const recipients = await getAllEmails(LIST_ID);
+            if (!recipients.length) {
+              console.log('No subscribers yet. Exiting gracefully.');
+              return;
+            }
+
+            // 3) Build email HTML
+            const html =
+              `<div style="font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:720px;margin:auto;padding:24px;">
+                 <h1 style="margin:0 0 16px 0;">Kernelcut · ${today} (UTC)</h1>
+                 ${items.map(i => `
+                   <h3 style="margin:18px 0 8px 0;">
+                     <a href="${i.url}" style="text-decoration:underline;color:#111;">${i.title}</a>
+                   </h3>
+                   <p style="margin:0 0 20px 0;color:#333;line-height:1.6;">${i.summary_long}</p>
+                 `).join('')}
+                 <p style="margin-top:24px;color:#666;font-size:12px;">You are receiving this because you subscribed to Kernelcut. Unsubscribe anytime.</p>
+               </div>`;
+
+            // 4) Prepare transactional send (to many "to" recipients)
+            const to = recipients.map(email => ({ email }));
+
+            // Brevo transactional API allows bulk "to". For large lists, switch to Campaigns API.
+            const payload = {
+              subject: `Kernelcut · ${today}`,
+              sender: { name: 'Kernelcut', email: 'no-reply@yourdomain' },
+              htmlContent: html,
+              to
+            };
+
+            const result = await brevoPost('/v3/smtp/email', payload);
+            console.log('Brevo response:', result);
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
