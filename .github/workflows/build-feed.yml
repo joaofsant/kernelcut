@@ -1,22 +1,23 @@
-name: pages: publish new UI + fresh playlist.json to docs/
+name: build-feed
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'index.html'
-      - 'scripts/**'
-      - '.github/workflows/build-feed.yml'
   schedule:
-    - cron: '*/30 * * * *'   # every 30 minutes (optional)
-  workflow_dispatch: {}
-
-permissions:
-  contents: write
+    - cron: '50 5 * * *'   # run daily at 05:50 UTC
+  workflow_dispatch:       # allow manual runs
+  push:
+    paths:
+      - 'scripts/**'
+      - 'docs/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/build-feed.yml'
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # required to commit to the repo
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,29 +26,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install deps (if any)
-        run: npm ci || npm i
+      - name: Install deps
+        run: npm ci
 
-      - name: Build feed
+      - name: Build feed (24h / 12 items)
         run: node scripts/buildFeed.mjs
 
-      - name: Prepare docs
+      - name: Guard: no audio UI allowed
         run: |
-          mkdir -p docs
-          cp -f index.html docs/index.html
-          cp -f playlist.json docs/playlist.json
+          if grep -Eiq "(<audio|player.js|aria-label=\"Play\")" docs/index.html; then
+            echo "Audio UI found in docs/index.html"; exit 1; fi
 
-      - name: Commit & push docs if changed
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit docs if changed
         run: |
-          if ! git diff --quiet -- docs/index.html docs/playlist.json; then
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add docs/index.html docs/playlist.json
-            git commit -m "pages: publish new UI + fresh playlist.json to docs/"
-            git push
-          else
-            echo "No changes to publish."
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/playlist.json
+          git diff --cached --quiet || git commit -m "pages: publish feed (24h/12 items)"
+
+      - name: Push back to main
+        run: git push origin HEAD:main
