@@ -1,15 +1,17 @@
+// scripts/buildFeed.mjs
 import fs from "fs/promises";
 import path from "path";
 import Parser from "rss-parser";
 import { htmlToText } from "html-to-text";
 
-// ------- knobs -------
-const HOURS_WINDOW = 36;
-const MAX_PER_CATEGORY = 2;   // <= 2 per category
-const MAX_TOTAL = 18;         // <= 18 total
-const OUTPUT = path.resolve(process.cwd(), "playlist.json");
+// ================== knobs ==================
+const HOURS_WINDOW = 24;      // strict 24h window
+const MAX_PER_CATEGORY = 99;  // no practical cap per category
+const CANDIDATE_LIMIT = 60;   // maximum candidates before final cut
+const TARGET_ITEMS = 12;      // final cutoff: 12 items
+const OUTPUT = path.resolve(process.cwd(), "docs/playlist.json");
 
-// ------- parser -------
+// ================== parser =================
 const parser = new Parser({
   timeout: 15000,
   headers: {
@@ -18,7 +20,7 @@ const parser = new Parser({
   }
 });
 
-// ------- categories (align with UI) -------
+// ================== categories =============
 const CATEGORIES = [
   { id: "bigtech",       name: "Tech Titans & Upstarts",              emoji: "🚀" },
   { id: "nextfrontiers", name: "Next Frontiers (Science & Futurism)", emoji: "🔬" },
@@ -31,7 +33,7 @@ const CATEGORIES = [
   { id: "space",         name: "Space & Exploration",                 emoji: "🛰️" }
 ];
 
-// ------- feeds (stable; no HN/Reddit) -------
+// ================== feeds ==================
 const FEEDS = {
   bigtech: [
     "https://techcrunch.com/feed/",
@@ -55,7 +57,7 @@ const FEEDS = {
   ai_data: [
     "http://export.arxiv.org/api/query?search_query=cat:cs.LG+OR+cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=80",
     "https://openai.com/blog/rss.xml",
-    "https://deepmind.google/discover/rss.xml" // if this 404s, it will be skipped quietly
+    "https://deepmind.google/discover/rss.xml"
   ],
   policy: [
     "https://edri.org/rss/",
@@ -76,25 +78,44 @@ const FEEDS = {
   ]
 };
 
-// ------- helpers -------
+// ================== helpers =================
 const cutoff = new Date(Date.now() - HOURS_WINDOW * 3600 * 1000);
 
 function normalizeUrl(raw) {
   try {
     const u = new URL(raw);
-    for (const p of ["utm_source","utm_medium","utm_campaign","utm_term","utm_content","utm_id","sr","fbclid","gclid","mc_cid","mc_eid"]) u.searchParams.delete(p);
+    for (const p of [
+      "utm_source","utm_medium","utm_campaign","utm_term","utm_content","utm_id",
+      "sr","fbclid","gclid","mc_cid","mc_eid"
+    ]) u.searchParams.delete(p);
     u.hash = "";
     return u.toString();
   } catch { return (raw || "").trim(); }
 }
-function normTitle(t) { return (t||"").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,"").replace(/\s+/g," ").trim(); }
-function textify(html) { return html ? htmlToText(html, { wordwrap:false, selectors:[{selector:"a", options:{ignoreHref:true}}] }).trim() : ""; }
+
+function normTitle(t) {
+  return (t || "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function textify(html) {
+  return html
+    ? htmlToText(html, { wordwrap: false, selectors: [{ selector: "a", options: { ignoreHref: true } }] }).trim()
+    : "";
+}
 
 function pickDate(it) {
   for (const f of [it.isoDate, it.pubDate, it.published, it.updated, it.date]) {
-    if (!f) continue; const d = new Date(f); if (!isNaN(d)) return d;
-  } return null;
+    if (!f) continue;
+    const d = new Date(f);
+    if (!isNaN(d)) return d;
+  }
+  return null;
 }
+
 function region(host) {
   if (!host) return "Global";
   if (host.endsWith(".co.uk") || host.includes("bbc")) return "UK";
@@ -107,7 +128,7 @@ function region(host) {
   return "Global";
 }
 
-// ------- medium-length summary (~120–160 words) -------
+// ---- long summary (~120–160 words; 4–7 sentences) ----
 function longSummary({ title, description, content, source, published_at }) {
   const raw = textify(content || description || "");
   const clean = raw.replace(/\s+/g, " ").trim();
@@ -125,10 +146,8 @@ function longSummary({ title, description, content, source, published_at }) {
     try {
       if (!published_at) return "";
       const d = new Date(published_at);
-      return isNaN(d) ? "" : d.toISOString().slice(0,10);
-    } catch {
-      return "";
-    }
+      return isNaN(d) ? "" : d.toISOString().slice(0, 10);
+    } catch { return ""; }
   })();
 
   const where = source ? ` Source: ${source}.` : "";
@@ -142,11 +161,10 @@ What’s next: note near-term developments, expected responses, or signals to wa
   let out = (clean ? `${clean} ` : "") + scaffold;
   const pad = " Additional notes: independent validation, benchmarks, and follow-up announcements will clarify the real effect.";
 
-  while (words(out).length < TARGET_MIN) {
-    out += pad;
-  }
+  while (words(out).length < TARGET_MIN) out += pad;
 
-  return trimTo(out, TARGET_MAX) + (words(out).length > TARGET_MAX ? "…" : "");
+  const clipped = trimTo(out, TARGET_MAX);
+  return clipped + (words(out).length > TARGET_MAX ? "…" : "");
 }
 
 function dedupe(arr) {
@@ -168,25 +186,24 @@ async function fetchFeed(url) {
     const f = await parser.parseURL(url);
     return f.items || [];
   } catch {
-    // swallow noisy feed errors; we backfill anyway
     return [];
   }
 }
 
-// ------- build -------
+// ================== build ===================
 const results = [];
-const pool = []; // overflow items to backfill up to MAX_TOTAL
+const pool = []; // overflow items for controlled backfill
 
 for (const cat of CATEGORIES) {
   const feeds = FEEDS[cat.id] || [];
   const batches = await Promise.allSettled(feeds.map(u => fetchFeed(u)));
-  const items = batches.flatMap(b => b.status === "fulfilled" ? b.value : []);
+  const items = batches.flatMap(b => (b.status === "fulfilled" ? b.value : []));
 
-  // map
   const mapped = items.map(r => {
     const url = normalizeUrl(r.link || r.url || r.guid || "");
     const d = pickDate(r);
-    let host = ""; try { host = new URL(url).hostname; } catch {}
+    let host = "";
+    try { host = new URL(url).hostname; } catch {}
     return {
       title: r.title || "",
       url,
@@ -200,7 +217,7 @@ for (const cat of CATEGORIES) {
     };
   });
 
-  // filters: 36h window + anti-"comments" + anti-HN/Reddit
+  // filters: 24h, no HN/Reddit, no "comments/ask/show hn"
   const filtered = mapped.filter(m => {
     if (!m.published_at || new Date(m.published_at) < cutoff) return false;
     try {
@@ -213,75 +230,84 @@ for (const cat of CATEGORIES) {
   });
 
   const unique = dedupe(filtered)
-    .sort((a,b)=> new Date(b.published_at) - new Date(a.published_at));
+    .sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
 
-  // top-K per category
   const top = unique.slice(0, MAX_PER_CATEGORY);
   const rest = unique.slice(MAX_PER_CATEGORY);
 
-  // enrich top
-  results.push(...top.map(n => ({
-    id: `${cat.id}:${normTitle(n.title).slice(0,60)}:${n.published_at || ""}`,
-    title: n.title,
-    url: n.url,
-    category_id: n.category_id,
-    region: n.region || "Global",
-    source: n.source || "Unknown",
-    author: n.author || "",
-    published_at: n.published_at,
-    summary_long: longSummary({
+  results.push(
+    ...top.map(n => ({
+      id: `${cat.id}:${normTitle(n.title).slice(0, 60)}:${n.published_at || ""}`,
       title: n.title,
-      description: n.description,
-      content: n.content,
-      source: n.source,
-      published_at: n.published_at
-    }),
-    tags: []
-  })));
+      url: n.url,
+      category_id: n.category_id,
+      region: n.region || "Global",
+      source: n.source || "Unknown",
+      author: n.author || "",
+      published_at: n.published_at,
+      summary_long: longSummary({
+        title: n.title,
+        description: n.description,
+        content: n.content,
+        source: n.source,
+        published_at: n.published_at
+      }),
+      tags: []
+    }))
+  );
 
-  // enrich overflow into pool
-  pool.push(...rest.map(n => ({
-    id: `${cat.id}:${normTitle(n.title).slice(0,60)}:${n.published_at || ""}`,
-    title: n.title,
-    url: n.url,
-    category_id: n.category_id,
-    region: n.region || "Global",
-    source: n.source || "Unknown",
-    author: n.author || "",
-    published_at: n.published_at,
-    summary_long: longSummary({
+  pool.push(
+    ...rest.map(n => ({
+      id: `${cat.id}:${normTitle(n.title).slice(0, 60)}:${n.published_at || ""}`,
       title: n.title,
-      description: n.description,
-      content: n.content,
-      source: n.source,
-      published_at: n.published_at
-    }),
-    tags: []
-  })));
+      url: n.url,
+      category_id: n.category_id,
+      region: n.region || "Global",
+      source: n.source || "Unknown",
+      author: n.author || "",
+      published_at: n.published_at,
+      summary_long: longSummary({
+        title: n.title,
+        description: n.description,
+        content: n.content,
+        source: n.source,
+        published_at: n.published_at
+      }),
+      tags: []
+    }))
+  );
 }
 
-// dedupe + sort initial
-let final = dedupe(results)
-  .sort((a,b)=> new Date(b.published_at) - new Date(a.published_at));
+// dedupe + sort by recency
+let final = dedupe(results).sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
 
-// backfill up to MAX_TOTAL from pool (most recent first)
-if (final.length < MAX_TOTAL && pool.length) {
-  const poolSorted = dedupe(pool)
-    .sort((a,b)=> new Date(b.published_at) - new Date(a.published_at));
+// backfill up to CANDIDATE_LIMIT from pool (most recent first)
+if (final.length < CANDIDATE_LIMIT && pool.length) {
+  const poolSorted = dedupe(pool).sort(
+    (a, b) => new Date(b.published_at) - new Date(a.published_at)
+  );
 
   const seenUrl = new Set(final.map(i => normalizeUrl(i.url || "")));
   const seenTitle = new Set(final.map(i => normTitle(i.title || "")));
 
   for (const item of poolSorted) {
-    if (final.length >= MAX_TOTAL) break;
+    if (final.length >= CANDIDATE_LIMIT) break;
     const u = normalizeUrl(item.url || "");
     const t = normTitle(item.title || "");
     if ((u && seenUrl.has(u)) || (t && seenTitle.has(t))) continue;
-    seenUrl.add(u); if (t) seenTitle.add(t);
+    seenUrl.add(u);
+    if (t) seenTitle.add(t);
     final.push(item);
   }
 }
 
-// write
+// FINAL CUT: exactly 12 items
+final = final.slice(0, TARGET_ITEMS);
+
+// ensure docs/ exists and write
+await fs.mkdir(path.dirname(OUTPUT), { recursive: true });
 await fs.writeFile(OUTPUT, JSON.stringify(final, null, 2), "utf8");
-console.log(`Wrote ${final.length} items to playlist.json (<= ${MAX_PER_CATEGORY}/cat, <= ${MAX_TOTAL} total, ${HOURS_WINDOW}h window)`);
+
+console.log(
+  `Wrote ${final.length} items to docs/playlist.json (<= ${MAX_PER_CATEGORY}/cat, candidates <= ${CANDIDATE_LIMIT}, ${HOURS_WINDOW}h window, final ${TARGET_ITEMS})`
+);
