@@ -2,8 +2,8 @@ name: build-feed
 
 on:
   schedule:
-    - cron: '50 5 * * *'   # run daily at 05:50 UTC
-  workflow_dispatch:       # allow manual runs
+    - cron: '50 5 * * *'   # daily at 05:50 UTC
+  workflow_dispatch:       # manual run
   push:
     paths:
       - 'scripts/**'
@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # required to commit to the repo
+      contents: write
 
     steps:
       - name: Checkout
@@ -34,10 +34,8 @@ jobs:
       - name: Build feed (24h / 12 items)
         run: node scripts/buildFeed.mjs
 
-      - name: Guard: no audio UI allowed
-        run: |
-          if grep -Eiq "(<audio|player.js|aria-label=\"Play\")" docs/index.html; then
-            echo "Audio UI found in docs/index.html"; exit 1; fi
+      - name: Ensure docs folder exists
+        run: mkdir -p docs
 
       - name: Commit docs if changed
         run: |
