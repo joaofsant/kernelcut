@@ -26,8 +26,18 @@
 
     /* newsletter */
     .newsletter { margin-bottom: 24px; text-align: left; }
-    .newsletter p { margin: 0 0 6px; color: var(--muted); font-size: 14px; }
-    .muted { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .newsletter h2 { font-size: 15px; font-weight: 600; margin: 0 0 8px 0; color: #555; }
+    .nl-brevo { display: flex; gap: 8px; align-items: center; max-width: 360px; }
+    .nl-brevo input[type="email"]{
+      flex: 1; height: 36px; padding: 6px 10px; font-size: 14px;
+      border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--fg);
+    }
+    .nl-brevo button{
+      height: 36px; padding: 0 12px; font-weight: 600; cursor: pointer;
+      border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--fg);
+    }
+    .nl-brevo button:hover { background: #f5f5f5; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
     /* sections and items */
     .section { margin: 26px 0 8px; }
@@ -47,38 +57,35 @@
 
   <div class="wrap">
     <!-- newsletter -->
-<section class="newsletter" aria-labelledby="nl-title">
-  <h2 id="nl-title" style="font-size:15px; font-weight:600; margin:0 0 8px 0; color:#555;">
-    06:00 UTC — one concise email per day.
-  </h2>
+    <section class="newsletter" aria-labelledby="nl-title">
+      <h2 id="nl-title">06:00 UTC — one concise email per day.</h2>
 
-  <div style="max-width:360px;">
-    <iframe
-      src="https://4c375712.sibforms.com/serve/XXXXXXXX"  <!-- o link do teu form -->
-      width="100%" height="160" frameborder="0"
-      style="border:0; background:#fff; max-width:360px;">
-    </iframe>
-  </div>
+      <!-- Minimal Brevo POST form (no external CSS/JS, no banners) -->
+      <form class="nl-brevo" method="POST"
+        action="https://4c375712.sibforms.com/serve/MUIFAP--TDmKcMpec5L78tO0cIgRbArrYaO_9Ef18qgP_uyYkZmLngk_LKCBucmBaIDeXspyhDEyxX4V0mattdBzS1oj5Px1xNOrpzbQi12JVAYYKO7oHLfb7eHQ3cAu7XrtdCtvY6Cxhp2jx48Xz6uQljww40nHgP7nC2azZcuxW22bkZWG_W0bB6zj_K9m9sk4kkTkL3p2ml_r">
+        <label class="sr-only" for="EMAIL">Email</label>
+        <input id="EMAIL" name="EMAIL" type="email" placeholder="you@domain.com" required />
+        <button type="submit">Subscribe</button>
 
-  <p style="font-size:12px; color:#999; margin-top:6px;">
-  </p>
-</section>
+        <!-- Required by Brevo -->
+        <input type="text" name="email_address_check" value="" class="sr-only" aria-hidden="true" tabindex="-1" />
+        <input type="hidden" name="locale" value="en" />
+      </form>
+    </section>
 
     <!-- news sections -->
     <div id="sections" aria-live="polite"></div>
   </div>
 
   <script>
-    // Display today's date in UTC at the top
+    // Show today's UTC date
     (function showUTCDate() {
-      const now = new Date();
-      const iso = now.toISOString().slice(0, 10);
+      const iso = new Date().toISOString().slice(0, 10);
       document.getElementById('digest-date').textContent = `${iso} (UTC)`;
     })();
 
     async function loadFeed() {
-      // Cache-bust with the UTC date so Pages/CDN doesn’t serve stale JSON
-      const d = new Date().toISOString().slice(0, 10);
+      const d = new Date().toISOString().slice(0, 10); // cache-bust
       const res = await fetch(`./playlist.json?d=${d}`, { cache: 'no-store' });
       if (!res.ok) {
         document.getElementById('sections').textContent = 'Failed to load feed.';
@@ -94,22 +101,18 @@
         { id: 'ai_data',       name: 'AI & Data Realities',                 emoji: '📊' },
         { id: 'policy',        name: 'Digital Policy & Society',            emoji: '🌍' },
         { id: 'fintech',       name: 'Fintech & Crypto',                    emoji: '💸' },
-        // keep consumer only if your builder still outputs it
         { id: 'consumer',      name: 'Consumer Tech & Gadgets',             emoji: '📱' },
         { id: 'space',         name: 'Space & Exploration',                 emoji: '🛰️' }
       ];
 
-      // Group by category
       const byCat = items.reduce((acc, it) => {
         (acc[it.category_id] ||= []).push(it);
         return acc;
       }, Object.create(null));
 
-      // Render
       const $sections = document.getElementById('sections');
       $sections.innerHTML = '';
 
-      // Helper: UTC format "YYYY-MM-DD HH:MM"
       const fmtUTC = ts => {
         const d = new Date(ts);
         return new Intl.DateTimeFormat('en-GB', {
@@ -142,7 +145,7 @@
             .concat([fmtUTC(n.published_at), n.region || 'Global'])
             .filter(Boolean)
             .join(' • ')
-            .replace('• —', '—'); // tidy separator
+            .replace('• —', '—');
 
           art.innerHTML = `
             <div class="meta">${metaSource}</div>
@@ -157,7 +160,6 @@
     }
 
     loadFeed();
-    // No client-side newsletter submit handler: Brevo iframe handles everything.
   </script>
 </body>
 </html>
