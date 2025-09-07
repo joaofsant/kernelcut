@@ -12,6 +12,18 @@
     "tags": []
   },
   {
+    "id": "consumer:microsofts cloud service restored after reports of cut cable:2025-09-07T19:23:12.000Z",
+    "title": "Microsoft's cloud service restored after reports of cut cables in the Red Sea",
+    "url": "https://www.engadget.com/big-tech/microsofts-cloud-service-restored-after-reports-of-cut-cables-in-the-red-sea-192312354.html?src=rss",
+    "category_id": "consumer",
+    "region": "Global",
+    "source": "www.engadget.com",
+    "author": "Jackson Chen",
+    "published_at": "2025-09-07T19:23:12.000Z",
+    "summary_long": "Microsoft said its Azure cloud platform has returned to normal service after an incident of cut underwater cables that played out over Saturday. The tech giant reported \"undersea fiber cuts\" in the Red Sea on Saturday morning, which disrupted Azure service throughout the Middle East and led to potential \"increased latency\" for users. Microsoft said that the latency issue was resolved by Saturday evening and was able to reroute the Azure traffic through other paths. Microsoft didn't provide a reason for why the undersea cables were cut. Source: www.engadget.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
     "id": "nextfrontiers:ai shakes up the call center industry but some tasks are sti:2025-09-07T17:09:55.000Z",
     "title": "AI shakes up the call center industry, but some tasks are still better left to the humans",
     "url": "https://techxplore.com/news/2025-09-ai-center-industry-tasks-left.html",
@@ -129,18 +141,6 @@
     "author": "\n                    Jonathan M. Gitlin\n                ",
     "published_at": "2025-09-07T13:00:58.000Z",
     "summary_long": "Today, Porsche debuted a new 911 variant at the IAA Mobility show in Munich, Germany. It's the most powerful 911 to date, excluding some limited-run models, and may well be the quickest to 60 mph from a standing start, dispatching that dash in just 2.4 seconds. And it's all thanks to one of the most interesting hybrid powertrains on sale today. Rather than just bolting an electric motor to an existing 911, Porsche designed an entirely new 3.6 L flat-six engine, taking the opportunity to ditch the belt drive and move some of the ancillaries, which can instead be powered by the car's 400 V traction battery. Source: arstechnica.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "bigtech:computer chips with a side of forever chemicals:2025-09-07T12:00:00.000Z",
-    "title": "Computer chips, with a side of forever chemicals",
-    "url": "https://www.theverge.com/the-stepback-newsletter/772845/computer-chips-forever-chemicals",
-    "category_id": "bigtech",
-    "region": "Global",
-    "source": "www.theverge.com",
-    "author": "Justine Calma",
-    "published_at": "2025-09-07T12:00:00.000Z",
-    "summary_long": "This is The Stepback, a weekly newsletter breaking down one essential story from the tech world. For more on all things at the intersection of environment and technology, follow Justine Calma. Opt in for The Stepback here. HOW IT STARTED Some stories that I've worked on as an environmental journalist still haunt me. Source: www.theverge.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   }
 ]
