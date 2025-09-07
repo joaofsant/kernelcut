@@ -28,14 +28,24 @@ jobs:
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }} # optional (falls back if not set)
         run: |
           node - <<'NODE'
           const fs = require('fs');
           const https = require('https');
 
-          const API_KEY = process.env.BREVO_API_KEY;
-          const LIST_ID = Number(process.env.BREVO_LIST_ID || 0);
+          // --- sanitize secrets (fixes ERR_INVALID_CHAR) ---
+          const RAW_KEY = process.env.BREVO_API_KEY || '';
+          const API_KEY = RAW_KEY.replace(/[\r\n\t"'\u00A0]/g, '').trim();
+          const RAW_LIST = String(process.env.BREVO_LIST_ID || '').trim();
+          const LIST_ID = RAW_LIST.replace(/[^\d]/g, ''); // digits only
+          const SENDER_EMAIL = (process.env.SENDER_EMAIL || 'no-reply@kernelcut.local').trim();
+
           if (!API_KEY) { console.error('Missing BREVO_API_KEY secret'); process.exit(1); }
+          if (!/^[A-Za-z0-9_-]+$/.test(API_KEY)) {
+            console.error('BREVO_API_KEY contains invalid characters (spaces/newlines/quotes). Fix the secret in GitHub → Settings → Secrets.');
+            process.exit(1);
+          }
           if (!LIST_ID) { console.error('Missing BREVO_LIST_ID secret'); process.exit(1); }
 
           function brevoGet(path) {
@@ -83,7 +93,18 @@ jobs:
           }
 
           // 1) Load curated items
-          const items = JSON.parse(fs.readFileSync('docs/playlist.json', 'utf8'));
+          let items = [];
+          try {
+            items = JSON.parse(fs.readFileSync('docs/playlist.json', 'utf8'));
+          } catch (e) {
+            console.error('Failed to read docs/playlist.json:', e.message);
+            process.exit(1);
+          }
+          if (!Array.isArray(items) || items.length === 0) {
+            console.log('No items to send today. Exiting gracefully.');
+            process.exit(0);
+          }
+
           const today = new Date().toISOString().slice(0,10);
 
           // 2) Fetch all contacts from the list (paginate)
@@ -118,16 +139,14 @@ jobs:
                    </h3>
                    <p style="margin:0 0 20px 0;color:#333;line-height:1.6;">${i.summary_long}</p>
                  `).join('')}
-                 <p style="margin-top:24px;color:#666;font-size:12px;">You are receiving this because you subscribed to Kernelcut. Unsubscribe anytime.</p>
                </div>`;
 
             // 4) Prepare transactional send (to many "to" recipients)
             const to = recipients.map(email => ({ email }));
 
-            // Brevo transactional API allows bulk "to". For large lists, switch to Campaigns API.
             const payload = {
               subject: `Kernelcut · ${today}`,
-              sender: { name: 'Kernelcut', email: 'no-reply@yourdomain' },
+              sender: { name: 'Kernelcut', email: SENDER_EMAIL },
               htmlContent: html,
               to
             };
