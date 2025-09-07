@@ -20,26 +20,14 @@
     header { max-width: var(--maxw); margin: 28px auto 20px; padding: 0 16px; }
     h1 { margin: 0 0 2px; font-size: 24px; font-weight: 800; }
     .tagline { margin: 2px 0 0; color: var(--muted); font-size: 14px; font-weight: 600; letter-spacing: .02em; }
+    .date { margin-top: 4px; color: var(--muted); font-size: 13px; }
     .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px 48px; }
     hr { border: 0; border-top: 1px solid var(--rule); margin: 20px 0; }
 
     /* newsletter */
     .newsletter { margin-bottom: 24px; }
     .newsletter p { margin: 0 0 6px; color: var(--muted); font-size: 14px; }
-    .nl-row { display: inline-flex; gap: 8px; align-items: center; }
-    input[type="email"] {
-      width: 280px; height: 36px;
-      padding: 6px 10px;
-      border: 1px solid var(--rule); border-radius: 6px;
-      background: #fff; color: var(--fg); font-size: 14px;
-    }
-    button {
-      height: 36px; padding: 0 12px;
-      border: 1px solid var(--rule); border-radius: 6px;
-      background: #fff; color: var(--fg); cursor: pointer; font-weight: 600;
-    }
-    button:hover { background:#f5f5f5; }
-    .muted { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .muted { color: var(--muted); font-size: 12px; margin-top: 4px; }
 
     /* sections and items */
     .section { margin: 26px 0 8px; }
@@ -54,53 +42,88 @@
   <header>
     <h1>Kernelcut</h1>
     <p class="tagline">Daily Tech Digest</p>
+    <div class="date" id="digest-date"></div>
   </header>
 
   <div class="wrap">
     <!-- newsletter -->
     <section class="newsletter" aria-labelledby="nl-title">
       <p id="nl-title">06:00 UTC — one concise email per day.</p>
-      <form id="nl-form" class="nl-row" novalidate>
-        <label class="sr-only" for="nl-email">Email</label>
-        <input id="nl-email" name="email" type="email" placeholder="you@domain.com" required />
-        <button id="nl-btn" type="submit">Subscribe</button>
-      </form>
-      <div id="nl-msg" class="muted" role="status"></div>
+
+      <!-- Brevo hosted form (iframe) -->
+      <iframe
+        title="Kernelcut subscription form"
+        src="https://4c375712.sibforms.com/serve/MUIFAMVIEN2nryAncthSsoEyCfNPR6HaYSqj8i0PUNDOTbSU5qKxPT1zf-lgYqrWLveu0t4XUg3S_qoSzp_rFIP9Rd1f2o-LozScJWBRw46ULz2cK93XHNJeIW0WyIBh4VaVyhMd-bGjlrSddSaqTqRha_ydpwhHIQddkvbG8AevqRJqjmFyZQ8WbVpXjFJaJKU2qTEd_bEAVsj1"
+        width="100%" height="360" frameborder="0"
+        style="border:0;max-width:560px;width:100%;"></iframe>
+
+      <p class="muted">Managed by Brevo • Double opt-in • Unsubscribe anytime.</p>
     </section>
 
     <hr />
 
     <!-- news sections -->
-    <div id="sections"></div>
+    <div id="sections" aria-live="polite"></div>
   </div>
 
   <script>
+    // Display today's date in UTC at the top
+    (function showUTCDate() {
+      const now = new Date();
+      const iso = now.toISOString().slice(0, 10);
+      document.getElementById('digest-date').textContent = `${iso} (UTC)`;
+    })();
+
     async function loadFeed() {
-      const res = await fetch('./playlist.json', { cache: 'no-store' });
+      // Cache-bust with the UTC date so Pages/CDN doesn’t serve stale JSON
+      const d = new Date().toISOString().slice(0, 10);
+      const res = await fetch(`./playlist.json?d=${d}`, { cache: 'no-store' });
+      if (!res.ok) {
+        document.getElementById('sections').textContent = 'Failed to load feed.';
+        return;
+      }
       const items = await res.json();
 
       const categories = [
-        { id: 'bigtech', name: 'Tech Titans & Upstarts', emoji: '🚀' },
+        { id: 'bigtech',       name: 'Tech Titans & Upstarts',              emoji: '🚀' },
         { id: 'nextfrontiers', name: 'Next Frontiers (Science & Futurism)', emoji: '🔬' },
-        { id: 'code', name: 'Code & Systems', emoji: '💻' },
-        { id: 'design', name: 'Design & Creativity', emoji: '🎨' },
-        { id: 'ai_data', name: 'AI & Data Realities', emoji: '📊' },
-        { id: 'policy', name: 'Digital Policy & Society', emoji: '🌍' },
-        { id: 'fintech', name: 'Fintech & Crypto', emoji: '💸' },
-        { id: 'consumer', name: 'Consumer Tech & Gadgets', emoji: '📱' },
-        { id: 'space', name: 'Space & Exploration', emoji: '🛰️' }
+        { id: 'code',          name: 'Code & Systems',                      emoji: '💻' },
+        { id: 'design',        name: 'Design & Creativity',                 emoji: '🎨' },
+        { id: 'ai_data',       name: 'AI & Data Realities',                 emoji: '📊' },
+        { id: 'policy',        name: 'Digital Policy & Society',            emoji: '🌍' },
+        { id: 'fintech',       name: 'Fintech & Crypto',                    emoji: '💸' },
+        // keep consumer only if your builder still outputs it
+        { id: 'consumer',      name: 'Consumer Tech & Gadgets',             emoji: '📱' },
+        { id: 'space',         name: 'Space & Exploration',                 emoji: '🛰️' }
       ];
 
-      // group items by category
+      // Group by category
       const byCat = items.reduce((acc, it) => {
-        (acc[it.category_id] ||= []).push(it); return acc;
-      }, {});
+        (acc[it.category_id] ||= []).push(it);
+        return acc;
+      }, Object.create(null));
 
+      // Render
       const $sections = document.getElementById('sections');
-      const fmt = ts => new Date(ts).toLocaleString('en-GB', { hour12: false });
+      $sections.innerHTML = '';
+
+      // Helper: UTC format "YYYY-MM-DD HH:MM"
+      const fmtUTC = ts => {
+        const d = new Date(ts);
+        return new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'UTC', hour12: false,
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        }).format(d).replace(/\//g, '-');
+      };
+
+      const toHTML = (s = '') =>
+        s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+         .replace(/\n\n+/g, '<br><br>');
 
       for (const cat of categories) {
-        const list = (byCat[cat.id] || []).sort((a,b)=> new Date(b.published_at) - new Date(a.published_at));
+        const list = (byCat[cat.id] || [])
+          .sort((a,b)=> new Date(b.published_at) - new Date(a.published_at));
         if (!list.length) continue;
 
         const sec = document.createElement('section');
@@ -111,22 +134,28 @@
         for (const n of list) {
           const art = document.createElement('article');
           art.className = 'item';
+
+          const metaSource = [cat.emoji + ' ' + cat.name, n.source || '']
+            .concat(n.author ? ['— ' + n.author] : [])
+            .concat([fmtUTC(n.published_at), n.region || 'Global'])
+            .filter(Boolean)
+            .join(' • ')
+            .replace('• —', '—'); // tidy separator
+
           art.innerHTML = `
-            <div class="meta">${cat.emoji} ${cat.name} • ${n.source || ''}${n.author ? ' — ' + n.author : ''} • ${fmt(n.published_at)} • ${n.region || 'Global'}</div>
-            <h4 class="title"><a href="${n.url}" target="_blank" rel="noopener noreferrer">${n.title}</a></h4>
-            <p class="summary">${(n.summary_long || '').replace(/\\n\\n/g, '<br><br>')}</p>
+            <div class="meta">${metaSource}</div>
+            <h4 class="title">
+              <a href="${n.url}" target="_blank" rel="noopener noreferrer">${n.title}</a>
+            </h4>
+            <p class="summary">${toHTML(n.summary_long || '')}</p>
           `;
           $sections.appendChild(art);
         }
       }
     }
-    loadFeed();
 
-    // newsletter submit handler (demo)
-    document.getElementById('nl-form').addEventListener('submit', e => {
-      e.preventDefault();
-      document.getElementById('nl-msg').textContent = "Subscribed (demo).";
-    });
+    loadFeed();
+    // No client-side newsletter submit handler: Brevo iframe handles everything.
   </script>
 </body>
 </html>
