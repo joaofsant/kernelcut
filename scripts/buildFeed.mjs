@@ -29,7 +29,6 @@ const CATEGORIES = [
   { id: "ai_data",       name: "AI & Data Realities",                 emoji: "📊" },
   { id: "policy",        name: "Digital Policy & Society",            emoji: "🌍" },
   { id: "fintech",       name: "Fintech & Crypto",                    emoji: "💸" },
-  // If you decide to keep consumer, it will be down-weighted by scoring.
   { id: "consumer",      name: "Consumer Tech & Gadgets",             emoji: "📱" },
   { id: "space",         name: "Space & Exploration",                 emoji: "🛰️" }
 ];
@@ -108,7 +107,7 @@ const SOURCE_WEIGHTS = {
   "techcrunch.com": 1.0,
   "edri.org": 1.2,
   "schneier.com": 1.2,
-  "theverge.com": 0.4,   // down-weight consumer-y sources
+  "theverge.com": 0.4,
   "engadget.com": 0.4
 };
 
@@ -198,40 +197,71 @@ function recencyScore(iso) {
   return Math.max(0, 1 - Math.min(hrs, 24) / 24); // 1 → 0 across 24h
 }
 
-// ---- long summary (~120–160 words; 4–7 sentences)
+// ---------- summarization helpers ----------
+function splitSentences(s) {
+  return (s || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(/(?<=[.!?])\s+/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+function uniqSentences(arr) {
+  const seen = new Set(); const out = [];
+  for (const s of arr) {
+    const k = s.toLowerCase();
+    if (!seen.has(k)) { seen.add(k); out.push(s); }
+  }
+  return out;
+}
+function wordCount(s) { return (s || "").trim().split(/\s+/).filter(Boolean).length; }
+function clipWords(s, max) {
+  const w = s.trim().split(/\s+/);
+  return w.length <= max ? s.trim() : w.slice(0, max).join(" ") + "…";
+}
+
+// ---- long summary (~100–160 words; no padding, no repeats)
 function longSummary({ title, description, content, source, published_at }) {
-  const raw = textify(content || description || "");
-  const clean = raw.replace(/\s+/g, " ").trim();
+  const base = textify(content || description || "");
   const t = textify(title || "").trim();
 
-  const TARGET_MIN = 120, TARGET_MAX = 160;
-  const words = s => s.split(/\s+/).filter(Boolean);
-  const trimTo = (s, n) => words(s).slice(0, n).join(" ");
+  // sentence-level cleanup
+  let sentences = splitSentences(base).filter(s => {
+    const low = s.toLowerCase();
+    if (!s) return false;
+    if (low.startsWith("image:") || low.startsWith("photo:") || low.startsWith("video:")) return false;
+    if (low.includes("subscribe") || low.includes("sign up") || low.includes("read more")) return false;
+    return true;
+  });
+  sentences = uniqSentences(sentences);
 
-  if (words(clean).length >= TARGET_MAX) return trimTo(clean, TARGET_MAX) + "…";
+  // build a readable paragraph
+  let lead = sentences.slice(0, 4).join(" ");
+  if (!lead || wordCount(lead) < 40) lead = t; // fallback
 
-  const when = (() => {
+  const parts = [lead];
+
+  if (source) parts.push(`Source: ${source}.`);
+  if (published_at) {
     try {
-      if (!published_at) return "";
       const d = new Date(published_at);
-      return isNaN(d) ? "" : d.toISOString().slice(0, 10);
-    } catch { return ""; }
-  })();
+      if (!isNaN(d)) parts.push(`Date: ${d.toISOString().slice(0, 10)}.`);
+    } catch {}
+  }
 
-  const where = source ? ` Source: ${source}.` : "";
+  // minimal, single-use scaffolding (optional)
+  const scaffold = [
+    "Why it matters: outline likely impact on technology, business, or society.",
+    "What’s next: note near-term developments or signals to watch."
+  ];
+  const MAX = 160;
+  for (const line of scaffold) {
+    const joined = parts.concat(line).join(" ");
+    if (wordCount(joined) <= MAX) parts.push(line);
+    else break;
+  }
 
-  const scaffold =
-`${clean || t}.
-Why it matters: highlight the impact on technology, business, or society.${where}
-Who is affected: identify the main stakeholders or users and how they may change their work or strategy.
-What’s next: note near-term developments, expected responses, or signals to watch.${when ? ` Date: ${when}.` : ""}`;
-
-  let out = (clean ? `${clean} ` : "") + scaffold;
-  const pad = " Additional notes: independent validation, benchmarks, and follow-up announcements will clarify the real effect.";
-  while (words(out).length < TARGET_MIN) out += pad;
-
-  const clipped = trimTo(out, TARGET_MAX);
-  return clipped + (words(out).length > TARGET_MAX ? "…" : "");
+  return clipWords(parts.join(" "), MAX);
 }
 
 function dedupe(arr) {
