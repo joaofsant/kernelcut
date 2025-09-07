@@ -1,5 +1,17 @@
 [
   {
+    "id": "bigtech:are bad incentives to blame for ai hallucinations:2025-09-07T21:23:23.000Z",
+    "title": "Are bad incentives to blame for AI hallucinations?",
+    "url": "https://techcrunch.com/2025/09/07/are-bad-incentives-to-blame-for-ai-hallucinations/",
+    "category_id": "bigtech",
+    "region": "Global",
+    "source": "techcrunch.com",
+    "author": "Anthony Ha",
+    "published_at": "2025-09-07T21:23:23.000Z",
+    "summary_long": "Are bad incentives to blame for AI hallucinations? Source: techcrunch.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
     "id": "bigtech:hyundais evtol startup supernal pauses work following ceo an:2025-09-07T19:19:08.000Z",
     "title": "Hyundai’s eVTOL startup Supernal pauses work following CEO and CTO departures",
     "url": "https://techcrunch.com/2025/09/07/hyundais-evtol-startup-supernal-pauses-work-following-ceo-and-cto-departures/",
@@ -9,6 +21,42 @@
     "author": "Sean O'Kane",
     "published_at": "2025-09-07T19:19:08.000Z",
     "summary_long": "Hyundai’s eVTOL startup Supernal pauses work following CEO and CTO departures Source: techcrunch.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "bigtech:koah raises 5m to bring ads into ai apps:2025-09-07T20:48:42.000Z",
+    "title": "Koah raises $5M to bring ads into AI apps",
+    "url": "https://techcrunch.com/2025/09/07/koah-raises-5m-to-bring-ads-into-ai-apps/",
+    "category_id": "bigtech",
+    "region": "Global",
+    "source": "techcrunch.com",
+    "author": "Anthony Ha",
+    "published_at": "2025-09-07T20:48:42.000Z",
+    "summary_long": "Koah raises $5M to bring ads into AI apps Source: techcrunch.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "bigtech:microsoft says azure affected after cables cut in the red se:2025-09-07T21:31:17.000Z",
+    "title": "Microsoft says Azure affected after cables cut in the Red Sea",
+    "url": "https://techcrunch.com/2025/09/07/microsoft-says-azure-affected-after-cables-cut-in-the-red-sea/",
+    "category_id": "bigtech",
+    "region": "Global",
+    "source": "techcrunch.com",
+    "author": "Anthony Ha",
+    "published_at": "2025-09-07T21:31:17.000Z",
+    "summary_long": "Microsoft says Azure affected after cables cut in the Red Sea Source: techcrunch.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "bigtech:google finally details gemini usage limits:2025-09-07T19:51:23.000Z",
+    "title": "Google finally details Gemini usage limits",
+    "url": "https://www.theverge.com/news/773496/google-gemini-usage-limits",
+    "category_id": "bigtech",
+    "region": "Global",
+    "source": "www.theverge.com",
+    "author": "Terrence O’Brien",
+    "published_at": "2025-09-07T19:51:23.000Z",
+    "summary_long": "Until very recently it wasn’t clear what usage limits were placed on Gemini at the various tiers. Free accounts are also limited to five Deep Research reports and 100 generated images a day. If you need to make more than 100 AI generated images in a day, A: For what? B: Upgrading to a Pro or Ultra account will get you 1,000 images. Source: www.theverge.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
@@ -84,18 +132,6 @@
     "tags": []
   },
   {
-    "id": "bigtech:microsoft says azure affected after cables cut in the red se:2025-09-07T15:22:42.000Z",
-    "title": "Microsoft says Azure affected after cables cut in the Red Sea",
-    "url": "https://techcrunch.com/2025/09/07/microsoft-says-azure-affected-after-cables-cut-in-the-red-sea/",
-    "category_id": "bigtech",
-    "region": "Global",
-    "source": "techcrunch.com",
-    "author": "Anthony Ha",
-    "published_at": "2025-09-07T15:22:42.000Z",
-    "summary_long": "Microsoft says Azure affected after cables cut in the Red Sea Source: techcrunch.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
     "id": "consumer:human stem cells age more rapidly in space study finds:2025-09-07T14:56:51.000Z",
     "title": "Human stem cells age more rapidly in space, study finds",
     "url": "https://www.engadget.com/human-stem-cells-age-more-rapidly-in-space-study-finds-145651426.html?src=rss",
@@ -105,42 +141,6 @@
     "author": "",
     "published_at": "2025-09-07T14:56:51.000Z",
     "summary_long": "While scientists are still working to understand the effects an extended trip to space can have on the human body, research in recent years has suggested that astronauts may experience some pretty dramatic changes on both the physiological and psychological levels. In the latest study led by a team at University of California San Diego, researchers found signs of accelerated aging in human stem cells that spent roughly a month in space. The research focused on hematopoietic stem and progenitor cells (HSPCs), which are crucial in the formation of blood and immune cells. Stem cells were sent to the International Space Station for stays of 32-45 days using specially developed nanobioreactors to monitor them. Source: www.engadget.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "fintech:bitcoin illiquid supply hits record 143m as longterm holders:2025-09-07T14:00:00.000Z",
-    "title": "Bitcoin Illiquid Supply Hits Record 14.3M as Long-Term Holders Continue to Accumulate",
-    "url": "https://www.coindesk.com/markets/2025/09/07/bitcoin-illiquid-supply-hits-record-14-3m-as-long-term-holders-continue-to-accumulate",
-    "category_id": "fintech",
-    "region": "Global",
-    "source": "www.coindesk.com",
-    "author": "James Van Straten",
-    "published_at": "2025-09-07T14:00:00.000Z",
-    "summary_long": "Bitcoin’s illiquid supply—the portion of coins held by entities with little history of spending—has climbed to a new record high, surpassing 14.3 million BTC in late August, according to Glassnode. With 19.9 million BTC currently in circulation, around 72% of the total supply is now illiquid, held by entities such as long-term holders and cold storage investors. This growth highlights a sustained accumulation trend, even during recent market volatility. In mid-August, bitcoin hit an all-time high of $124,000 before retreating roughly 15%. Source: www.coindesk.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "fintech:stablecoin retail transfers break records in 2025 hit 58b in:2025-09-07T12:00:00.000Z",
-    "title": "Stablecoin Retail Transfers Break Records in 2025, Hit $5.8B in August",
-    "url": "https://www.coindesk.com/markets/2025/09/07/stablecoin-retail-transfers-break-records-in-2025-hit-usd5-8b-in-august",
-    "category_id": "fintech",
-    "region": "Global",
-    "source": "www.coindesk.com",
-    "author": "Krisztian Sandor",
-    "published_at": "2025-09-07T12:00:00.000Z",
-    "summary_long": "Stablecoin adoption among retail users has set new records this year, with transaction volumes through August already exceeding last year’s total, a fresh report by CEX.io said. Retail-sized transfers, counting transactions under $250, crossed $5.84 billion in August alone, the highest ever recorded, according to data by Visa and Allium cited in the report. With nearly four months left in the year, 2025 has already become the busiest period yet for stablecoin transfer volume at the consumer level. The figures underscore stablecoins, a group of cryptos tied to fiat currencies like the U.S. Source: www.coindesk.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "bigtech:porsches insanely clever hybrid engine comes to the 911 turb:2025-09-07T13:00:58.000Z",
-    "title": "Porsche’s insanely clever hybrid engine comes to the 911 Turbo S",
-    "url": "https://arstechnica.com/cars/2025/09/porsches-insanely-clever-hybrid-engine-comes-to-the-911-turbo-s/",
-    "category_id": "bigtech",
-    "region": "Global",
-    "source": "arstechnica.com",
-    "author": "\n                    Jonathan M. Gitlin\n                ",
-    "published_at": "2025-09-07T13:00:58.000Z",
-    "summary_long": "Today, Porsche debuted a new 911 variant at the IAA Mobility show in Munich, Germany. It's the most powerful 911 to date, excluding some limited-run models, and may well be the quickest to 60 mph from a standing start, dispatching that dash in just 2.4 seconds. And it's all thanks to one of the most interesting hybrid powertrains on sale today. Rather than just bolting an electric motor to an existing 911, Porsche designed an entirely new 3.6 L flat-six engine, taking the opportunity to ditch the belt drive and move some of the ancillaries, which can instead be powered by the car's 400 V traction battery. Source: arstechnica.com. Date: 2025-09-07. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   }
 ]
