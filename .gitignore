@@ -2,3 +2,7 @@ data/
 .venv/
 *.parquet
 __pycache__/
+node_modules/
+*.log
+.DS_Store
+docs/.seen_links.txt
