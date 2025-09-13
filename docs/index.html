@@ -20,24 +20,26 @@
     header { max-width: var(--maxw); margin: 28px auto 20px; padding: 0 16px; }
     h1 { margin: 0 0 2px; font-size: 24px; font-weight: 800; }
     .tagline { margin: 2px 0 0; color: var(--muted); font-size: 14px; font-weight: 600; letter-spacing: .02em; }
-    .date { margin-top: 4px; color: var(--muted); font-size: 13px; }
     .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px 48px; }
     hr { border: 0; border-top: 1px solid var(--rule); margin: 20px 0; }
 
     /* newsletter */
-    .newsletter { margin-bottom: 24px; text-align: left; }
-    .newsletter h2 { font-size: 15px; font-weight: 600; margin: 0 0 8px 0; color: #555; }
-    .nl-brevo { display: flex; gap: 8px; align-items: center; max-width: 360px; }
-    .nl-brevo input[type="email"]{
-      flex: 1; height: 36px; padding: 6px 10px; font-size: 14px;
-      border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--fg);
+    .newsletter { margin-bottom: 24px; }
+    .newsletter p { margin: 0 0 6px; color: var(--muted); font-size: 14px; }
+    .nl-row { display: inline-flex; gap: 8px; align-items: center; }
+    input[type="email"] {
+      width: 280px; height: 36px;
+      padding: 6px 10px;
+      border: 1px solid var(--rule); border-radius: 6px;
+      background: #fff; color: var(--fg); font-size: 14px;
     }
-    .nl-brevo button{
-      height: 36px; padding: 0 12px; font-weight: 600; cursor: pointer;
-      border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--fg);
+    button {
+      height: 36px; padding: 0 12px;
+      border: 1px solid var(--rule); border-radius: 6px;
+      background: #fff; color: var(--fg); cursor: pointer; font-weight: 600;
     }
-    .nl-brevo button:hover { background: #f5f5f5; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    button:hover { background:#f5f5f5; }
+    .muted { color: var(--muted); font-size: 13px; margin-top: 4px; }
 
     /* sections and items */
     .section { margin: 26px 0 8px; }
@@ -52,83 +54,53 @@
   <header>
     <h1>Kernelcut</h1>
     <p class="tagline">Daily Tech Digest</p>
-    <div class="date" id="digest-date"></div>
   </header>
 
   <div class="wrap">
     <!-- newsletter -->
     <section class="newsletter" aria-labelledby="nl-title">
-      <h2 id="nl-title">06:00 UTC — one concise email per day.</h2>
-
-      <!-- Minimal Brevo POST form (no external CSS/JS, no banners) -->
-      <form class="nl-brevo" method="POST"
-        action="https://4c375712.sibforms.com/serve/MUIFAP--TDmKcMpec5L78tO0cIgRbArrYaO_9Ef18qgP_uyYkZmLngk_LKCBucmBaIDeXspyhDEyxX4V0mattdBzS1oj5Px1xNOrpzbQi12JVAYYKO7oHLfb7eHQ3cAu7XrtdCtvY6Cxhp2jx48Xz6uQljww40nHgP7nC2azZcuxW22bkZWG_W0bB6zj_K9m9sk4kkTkL3p2ml_r">
-        <label class="sr-only" for="EMAIL">Email</label>
-        <input id="EMAIL" name="EMAIL" type="email" placeholder="you@domain.com" required />
-        <button type="submit">Subscribe</button>
-
-        <!-- Required by Brevo -->
-        <input type="text" name="email_address_check" value="" class="sr-only" aria-hidden="true" tabindex="-1" />
-        <input type="hidden" name="locale" value="en" />
+      <p id="nl-title">06:00 UTC — one concise email per day.</p>
+      <form id="nl-form" class="nl-row" novalidate>
+        <label class="sr-only" for="nl-email">Email</label>
+        <input id="nl-email" name="email" type="email" placeholder="you@domain.com" required />
+        <button id="nl-btn" type="submit">Subscribe</button>
       </form>
+      <div id="nl-msg" class="muted" role="status"></div>
     </section>
 
+    <hr />
+
     <!-- news sections -->
-    <div id="sections" aria-live="polite"></div>
+    <div id="sections"></div>
   </div>
 
   <script>
-    // Show today's UTC date
-    (function showUTCDate() {
-      const iso = new Date().toISOString().slice(0, 10);
-      document.getElementById('digest-date').textContent = `${iso} (UTC)`;
-    })();
-
     async function loadFeed() {
-      const d = new Date().toISOString().slice(0, 10); // cache-bust
-      const res = await fetch(`./playlist.json?d=${d}`, { cache: 'no-store' });
-      if (!res.ok) {
-        document.getElementById('sections').textContent = 'Failed to load feed.';
-        return;
-      }
+      const res = await fetch('./playlist.json', { cache: 'no-store' });
       const items = await res.json();
 
       const categories = [
-        { id: 'bigtech',       name: 'Tech Titans & Upstarts',              emoji: '🚀' },
+        { id: 'bigtech', name: 'Tech Titans & Upstarts', emoji: '🚀' },
         { id: 'nextfrontiers', name: 'Next Frontiers (Science & Futurism)', emoji: '🔬' },
-        { id: 'code',          name: 'Code & Systems',                      emoji: '💻' },
-        { id: 'design',        name: 'Design & Creativity',                 emoji: '🎨' },
-        { id: 'ai_data',       name: 'AI & Data Realities',                 emoji: '📊' },
-        { id: 'policy',        name: 'Digital Policy & Society',            emoji: '🌍' },
-        { id: 'fintech',       name: 'Fintech & Crypto',                    emoji: '💸' },
-        { id: 'consumer',      name: 'Consumer Tech & Gadgets',             emoji: '📱' },
-        { id: 'space',         name: 'Space & Exploration',                 emoji: '🛰️' }
+        { id: 'code', name: 'Code & Systems', emoji: '💻' },
+        { id: 'design', name: 'Design & Creativity', emoji: '🎨' },
+        { id: 'ai_data', name: 'AI & Data Realities', emoji: '📊' },
+        { id: 'policy', name: 'Digital Policy & Society', emoji: '🌍' },
+        { id: 'fintech', name: 'Fintech & Crypto', emoji: '💸' },
+        { id: 'consumer', name: 'Consumer Tech & Gadgets', emoji: '📱' },
+        { id: 'space', name: 'Space & Exploration', emoji: '🛰️' }
       ];
 
+      // group items by category
       const byCat = items.reduce((acc, it) => {
-        (acc[it.category_id] ||= []).push(it);
-        return acc;
-      }, Object.create(null));
+        (acc[it.category_id] ||= []).push(it); return acc;
+      }, {});
 
       const $sections = document.getElementById('sections');
-      $sections.innerHTML = '';
-
-      const fmtUTC = ts => {
-        const d = new Date(ts);
-        return new Intl.DateTimeFormat('en-GB', {
-          timeZone: 'UTC', hour12: false,
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit'
-        }).format(d).replace(/\//g, '-');
-      };
-
-      const toHTML = (s = '') =>
-        s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-         .replace(/\n\n+/g, '<br><br>');
+      const fmt = ts => new Date(ts).toLocaleString('en-GB', { hour12: false });
 
       for (const cat of categories) {
-        const list = (byCat[cat.id] || [])
-          .sort((a,b)=> new Date(b.published_at) - new Date(a.published_at));
+        const list = (byCat[cat.id] || []).sort((a,b)=> new Date(b.published_at) - new Date(a.published_at));
         if (!list.length) continue;
 
         const sec = document.createElement('section');
@@ -139,27 +111,22 @@
         for (const n of list) {
           const art = document.createElement('article');
           art.className = 'item';
-
-          const metaSource = [cat.emoji + ' ' + cat.name, n.source || '']
-            .concat(n.author ? ['— ' + n.author] : [])
-            .concat([fmtUTC(n.published_at), n.region || 'Global'])
-            .filter(Boolean)
-            .join(' • ')
-            .replace('• —', '—');
-
           art.innerHTML = `
-            <div class="meta">${metaSource}</div>
-            <h4 class="title">
-              <a href="${n.url}" target="_blank" rel="noopener noreferrer">${n.title}</a>
-            </h4>
-            <p class="summary">${toHTML(n.summary_long || '')}</p>
+            <div class="meta">${cat.emoji} ${cat.name} • ${n.source || ''}${n.author ? ' — ' + n.author : ''} • ${fmt(n.published_at)} • ${n.region || 'Global'}</div>
+            <h4 class="title"><a href="${n.url}" target="_blank" rel="noopener noreferrer">${n.title}</a></h4>
+            <p class="summary">${(n.summary_long || '').replace(/\\n\\n/g, '<br><br>')}</p>
           `;
           $sections.appendChild(art);
         }
       }
     }
-
     loadFeed();
+
+    // newsletter submit handler (demo)
+    document.getElementById('nl-form').addEventListener('submit', e => {
+      e.preventDefault();
+      document.getElementById('nl-msg').textContent = "Subscribed (demo).";
+    });
   </script>
 </body>
 </html>
