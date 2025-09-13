@@ -131,8 +131,7 @@
       const msg = document.getElementById('nl-msg');
       const WORKER_URL = 'https://white-cloud-96fc.joaofsant10.workers.dev'; // replaced via script below
 
-      function validEmail(e){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(e); }
-
+      function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         msg.textContent = '';
