@@ -6,7 +6,7 @@ import { htmlToText } from "html-to-text";
 
 // ============== knobs ==============
 const HOURS_WINDOW = 24;      // strict 24h window
-const MAX_PER_CATEGORY = 99;  // no practical per-category cap
+const MAX_PER_CATEGORY = 99;  // no practical per-category cap (kept for pool logic)
 const CANDIDATE_LIMIT = 60;   // cap before re-ranking
 const TARGET_ITEMS = 12;      // final cutoff
 const OUTPUT = path.resolve(process.cwd(), "docs/playlist.json");
@@ -78,38 +78,52 @@ const FEEDS = {
   ]
 };
 
-// ======= relevance rules (curation) =======
+// ======= relevance rules (base) =======
+// Keep a soft low-value filter for obvious shopping/reviews,
+// but don't ban brands; impact scoring below decides the rest.
 const BAD_KEYWORDS = [
   "vacuum", "robot vacuum", "mattress", "toothbrush", "tv screen", "how to clean",
   "coupon", "deal", "discount", "sale", "promo code", "gift guide", "buyers guide",
-  "buying guide", "the best", "best ", "hands-on", "review", "roundup"
+  "buying guide", "the best", "best ", "hands-on", "roundup"
 ];
 
-const BOOST_KEYWORDS = [
-  "ai", "machine learning", "neural", "llm", "openai", "deepmind",
-  "nasa", "space", "spacex", "satellite", "mission", "launch",
-  "cloud", "kubernetes", "infrastructure", "gpu", "nvidia", "amd",
-  "quantum", "compiler", "database", "postgres", "vector", "embedding",
-  "startup", "funding", "acquisition", "merger", "antitrust",
-  "privacy", "gdpr", "policy", "regulation", "cybersecurity", "encryption"
+// ======= hybrid impact scoring (contextual) =======
+// Reputation boosts
+const SOURCE_SCORE = new Map(Object.entries({
+  "ieee.org": 35, "spectrum.ieee.org": 35, "technologyreview.com": 30, "arstechnica.com": 28,
+  "bloomberg.com": 24, "reuters.com": 24, "ft.com": 22, "wsj.com": 20,
+  "wired.com": 18, "theverge.com": 12, "techcrunch.com": 12,
+  // official eng/research blogs
+  "research.google": 30, "openai.com": 30, "deepmind.google": 28, "nvidia.com": 26,
+  "microsoft.com": 22, "about.fb.com": 20, "aws.amazon.com": 22, "azure.microsoft.com": 20,
+  "databricks.com": 24, "snowflake.com": 22
+}));
+
+// Technical positives
+const TECH_POSITIVE = [
+  /ai|llm|model|dataset|benchmark|agent|inference/i,
+  /chip|gpu|semiconductor|foundry|nvidia|tpu|asic|cpu|interconnect/i,
+  /cloud|aws|gcp|azure|kafka|spark|databricks|snowflake|postgres|duckdb|sdk|api|vector db/i,
+  /security|privacy|encryption|breach|ransom|zero[- ]?day|cve|passkey|webauthn/i,
+  /robot|automation|autonomy|space|spacex|nasa|iss|fusion|quantum|materials/i,
+  /infra|scalability|latency|throughput|benchmark/i,
+  /startup|seed|series [abc]|ipo|acqui[- ]?hire/i
 ];
 
-const SOURCE_WEIGHTS = {
-  "arxiv.org": 2.0,
-  "nasa.gov": 2.0,
-  "esa.int": 1.7,
-  "spaceflightnow.com": 1.5,
-  "technologyreview.com": 1.5,
-  "openai.com": 1.5,
-  "deepmind.google": 1.5,
-  "github.blog": 1.3,
-  "stackoverflow.blog": 1.2,
-  "techcrunch.com": 1.0,
-  "edri.org": 1.2,
-  "schneier.com": 1.2,
-  "theverge.com": 0.4,
-  "engadget.com": 0.4
-};
+// Pop-culture noise (penalty, not hard block)
+const POP_CULTURE_NEGATIVE = [
+  /trailer|season|episode|casting|celebrity|box office|fans?/i,
+  /rumou?r|leak|teaser/i,
+  /recap|review(?!\s*paper)/i
+];
+
+// High-impact terms
+const IMPACT_TERMS = [
+  /acquisition|acquires|merger|ipo|funding|raises|series [abc]/i,
+  /breach|hack|ransom|shutdown|layoffs?/i,
+  /launch|release|general availability|ga\b|open[- ]?source/i,
+  /partnership|regulation|ban|compliance|gdpr|antitrust|doj|eu commission/i
+];
 
 // ============== helpers ==============
 const cutoff = new Date(Date.now() - HOURS_WINDOW * 3600 * 1000);
@@ -123,6 +137,10 @@ function normalizeUrl(raw) {
     u.hash = "";
     return u.toString();
   } catch { return (raw || "").trim(); }
+}
+
+function hostname(raw) {
+  try { return new URL(raw).hostname.replace(/^www\./, ""); } catch { return ""; }
 }
 
 function cleanTitle(t) {
@@ -178,19 +196,6 @@ function isLowValue(item) {
   return BAD_KEYWORDS.some(k => t.includes(k) || d.includes(k));
 }
 
-function relevanceScore(item) {
-  const text = (item.title + " " + item.description).toLowerCase();
-  let s = 0;
-  for (const k of BOOST_KEYWORDS) if (text.includes(k)) s += 1;
-  return Math.min(s, 7);
-}
-
-function sourceWeight(host) {
-  if (!host) return 1.0;
-  const h = host.replace(/^www\./, "");
-  return SOURCE_WEIGHTS[h] || 1.0;
-}
-
 function recencyScore(iso) {
   if (!iso) return 0;
   const hrs = (Date.now() - new Date(iso).getTime()) / 3.6e6;
@@ -240,7 +245,6 @@ function longSummary({ title, description, content, source, published_at }) {
   if (!lead || wordCount(lead) < 40) lead = t; // fallback
 
   const parts = [lead];
-
   if (source) parts.push(`Source: ${source}.`);
   if (published_at) {
     try {
@@ -249,7 +253,6 @@ function longSummary({ title, description, content, source, published_at }) {
     } catch {}
   }
 
-  // minimal, single-use scaffolding (optional)
   const scaffold = [
     "Why it matters: outline likely impact on technology, business, or society.",
     "What’s next: note near-term developments or signals to watch."
@@ -260,7 +263,6 @@ function longSummary({ title, description, content, source, published_at }) {
     if (wordCount(joined) <= MAX) parts.push(line);
     else break;
   }
-
   return clipWords(parts.join(" "), MAX);
 }
 
@@ -285,6 +287,93 @@ async function fetchFeed(url) {
   } catch {
     return [];
   }
+}
+
+// ===== Hacker News signals (optional) =====
+const ENABLE_HN = true;
+
+async function fetchHNSignals(limit = 100) {
+  if (!ENABLE_HN) return { urlPoints: new Map(), hotHosts: new Map() };
+  try {
+    const topIds = await fetch("https://hacker-news.firebaseio.com/v0/topstories.json")
+      .then(r => r.json()).then(ids => ids.slice(0, limit));
+    const items = await Promise.all(topIds.map(id =>
+      fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r => r.json()).catch(()=>null)
+    ));
+    const urlPoints = new Map();
+    const hotHosts = new Map();
+    for (const it of items.filter(Boolean)) {
+      if (!it.url || typeof it.score !== "number") continue;
+      const clean = normalizeUrl(it.url);
+      const host = hostname(clean);
+      urlPoints.set(clean, (urlPoints.get(clean) || 0) + it.score);
+      hotHosts.set(host, (hotHosts.get(host) || 0) + it.score);
+    }
+    return { urlPoints, hotHosts };
+  } catch (e) {
+    console.warn("[curation] HN fetch failed:", e.message);
+    return { urlPoints: new Map(), hotHosts: new Map() };
+  }
+}
+
+// ===== Category guesser (maps to your site cats) =====
+function guessCategoryFromText(a) {
+  const text = `${a.title || ""} ${a.summary_long || a.summary || ""}`.toLowerCase();
+  if (/ai|llm|model|dataset|benchmark|agent/.test(text)) return "ai_data";
+  if (/gpu|chip|semiconductor|nvidia|tpu|foundry|asic|cpu/.test(text)) return "bigtech";
+  if (/cloud|aws|gcp|azure|kafka|spark|postgres|duckdb|sdk|api|kubernetes|docker/.test(text)) return "code";
+  if (/quantum|robot|space|fusion|bio|materials|spacex|nasa|iss/.test(text)) return "nextfrontiers";
+  if (/design|ux|ui|accessibility|typography/.test(text)) return "design";
+  if (/breach|ransom|privacy|gdpr|security|zero[- ]?day|cve/.test(text)) return "policy"; // or "security" if you split
+  if (/wallet|stablecoin|defi|fintech|crypto|bitcoin|ethereum/.test(text)) return "fintech";
+  if (/iphone|android|gadget|wearable|headset|tv|console/.test(text)) return "consumer";
+  if (/policy|regulation|antitrust|ai act|doj|ec/.test(text)) return "policy";
+  if (/satellite|orbital|lunar|mars/.test(text)) return "space";
+  return "bigtech";
+}
+
+// ===== Impact scoring =====
+function scoreImpact(item, hnSignals) {
+  const title = item.title || "";
+  const sum = item.summary_long || item.summary || "";
+  const text = `${title} ${sum}`.toLowerCase();
+  const host = hostname(item.url || "");
+  let s = 0;
+
+  // Source reputation (by host)
+  if (SOURCE_SCORE.has(host)) s += SOURCE_SCORE.get(host);
+
+  // Technical content
+  if (TECH_POSITIVE.some(rx => rx.test(text))) {
+    s += 20;
+  }
+
+  // Pop-culture penalty
+  if (POP_CULTURE_NEGATIVE.some(rx => rx.test(text))) s -= 50;
+
+  // Impact terms (M&A, funding, breaches, GA, regulation, launches)
+  if (IMPACT_TERMS.some(rx => rx.test(text))) s += 30;
+
+  // Concrete numbers (money/users)
+  if (/\$[0-9]+(\.[0-9]+)?\s?(m|b)\b/i.test(text) || /\b[0-9]+ (million|billion|users)\b/i.test(text)) s += 10;
+
+  // Title quality
+  if (title.length <= 90) s += 4;
+
+  // Recency (normalize 0..10)
+  s += Math.round(recencyScore(item.published_at) * 10);
+
+  // Hacker News boosts
+  if (hnSignals) {
+    const pts = hnSignals.urlPoints.get(normalizeUrl(item.url || ""));
+    if (typeof pts === "number") {
+      s += Math.min(30, Math.round(Math.log2(1 + pts) * 6)); // direct URL match
+    } else {
+      const hostPts = hnSignals.hotHosts.get(host) || 0;
+      if (hostPts > 50) s += 4; // warm host
+    }
+  }
+  return s;
 }
 
 // ============== build ==============
@@ -317,7 +406,7 @@ for (const cat of CATEGORIES) {
     };
   });
 
-  // filters: time window + no HN/Reddit + no "comments/ask/show hn" + drop low-value
+  // base filters: time window + no HN/Reddit + drop low-value
   const filtered = mapped.filter(m => {
     if (!m.published_at || new Date(m.published_at) < cutoff) return false;
     try {
@@ -373,7 +462,7 @@ for (const cat of CATEGORIES) {
   })));
 }
 
-// initial recency sort + backfill
+// initial recency sort + backfill to candidate limit
 let final = dedupe(results).sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
 
 if (final.length < CANDIDATE_LIMIT && pool.length) {
@@ -390,24 +479,35 @@ if (final.length < CANDIDATE_LIMIT && pool.length) {
   }
 }
 
-// relevance re-ranking (freshness + topic + source weight)
-final = final
-  .map(i => {
-    let host = ""; try { host = new URL(i.url).hostname.replace(/^www\./, ""); } catch {}
-    const score =
-      0.55 * recencyScore(i.published_at) +        // 0..1
-      0.30 * (relevanceScore(i) / 7) +             // 0..1
-      0.15 * (sourceWeight(host) / 2.0);           // normalize to ~0..1
-    return { ...i, _score: score };
-  })
-  .sort((a, b) => b._score - a._score)
-  .map(({ _score, ...rest }) => rest);
+// ===== IMPACT RE-RANK + DIVERSITY =====
+const hnSignals = await fetchHNSignals(100);
 
-// final cut
-final = final.slice(0, TARGET_ITEMS);
+// score each item
+let scored = final.map(i => ({ ...i, _score: scoreImpact(i, hnSignals) }))
+  .filter(i => i._score > 0)
+  // tie-break by recency
+  .sort((a,b) => (b._score - a._score) || (new Date(b.published_at) - new Date(a.published_at)));
+
+// ensure category diversity: max 3 per category, cap total to TARGET_ITEMS
+function pickTopByCategory(arr, perCat = 3, maxTotal = TARGET_ITEMS) {
+  const out = [];
+  const used = new Map();
+  for (const it of arr) {
+    const key = it.category_id || "misc";
+    const n = used.get(key) || 0;
+    if (n < perCat) {
+      out.push(it);
+      used.set(key, n + 1);
+    }
+    if (out.length >= maxTotal) break;
+  }
+  return out;
+}
+
+final = pickTopByCategory(scored, 3, TARGET_ITEMS).map(({ _score, ...rest }) => rest);
 
 // write
 await fs.mkdir(path.dirname(OUTPUT), { recursive: true });
 await fs.writeFile(OUTPUT, JSON.stringify(final, null, 2), "utf8");
 
-console.log(`Wrote ${final.length} items to docs/playlist.json (24h window, final ${TARGET_ITEMS})`);
+console.log(`Wrote ${final.length} items to docs/playlist.json (impact-ranked, diversified, ${TARGET_ITEMS} max)`);
