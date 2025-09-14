@@ -21,43 +21,41 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Build feed (safety; regenerates docs/playlist.json)
-        run: node scripts/buildFeed.mjs
-
-      - name: Send daily digest via Brevo (to list)
+      - name: Send daily digest via Brevo (one-by-one, minimal template)
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
-          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }} # optional (falls back if not set)
+          SENDER_EMAIL:  ${{ secrets.SENDER_EMAIL }}   # ex.: news@kernelcut.com (domínio autenticado)
+          SENDER_NAME:   ${{ secrets.SENDER_NAME }}    # opcional (fallback = "Kernelcut")
         run: |
           node - <<'NODE'
           const fs = require('fs');
           const https = require('https');
 
-          // --- sanitize secrets (fixes ERR_INVALID_CHAR) ---
-          const RAW_KEY = process.env.BREVO_API_KEY || '';
-          const API_KEY = RAW_KEY.replace(/[\r\n\t"'\u00A0]/g, '').trim();
-          const RAW_LIST = String(process.env.BREVO_LIST_ID || '').trim();
-          const LIST_ID = RAW_LIST.replace(/[^\d]/g, ''); // digits only
-          const SENDER_EMAIL = (process.env.SENDER_EMAIL || 'no-reply@kernelcut.local').trim();
+          // === ENV & guards ===
+          const RAW_KEY   = process.env.BREVO_API_KEY || '';
+          const API_KEY   = RAW_KEY.replace(/[\r\n\t"'\u00A0]/g, '').trim();
+          const RAW_LIST  = String(process.env.BREVO_LIST_ID || '').trim();
+          const LIST_ID   = RAW_LIST.replace(/[^\d]/g, ''); // só dígitos
+          const SENDER_EMAIL = (process.env.SENDER_EMAIL || '').trim();
+          const SENDER_NAME  = (process.env.SENDER_NAME  || 'Kernelcut').trim();
 
-          if (!API_KEY) { console.error('Missing BREVO_API_KEY secret'); process.exit(1); }
+          for (const k of [['BREVO_API_KEY',API_KEY],['BREVO_LIST_ID',LIST_ID],['SENDER_EMAIL',SENDER_EMAIL]]) {
+            if (!k[1]) { console.error(`Missing required env: ${k[0]}`); process.exit(1); }
+          }
           if (!/^[A-Za-z0-9_-]+$/.test(API_KEY)) {
-            console.error('BREVO_API_KEY contains invalid characters (spaces/newlines/quotes). Fix the secret in GitHub → Settings → Secrets.');
+            console.error('BREVO_API_KEY contém caracteres inválidos (espaços/aspas/newlines). Corrige o secret.');
             process.exit(1);
           }
-          if (!LIST_ID) { console.error('Missing BREVO_LIST_ID secret'); process.exit(1); }
 
+          // === HTTP helpers ===
           function brevoGet(path) {
             return new Promise((resolve, reject) => {
               const req = https.request({
-                method: 'GET',
-                hostname: 'api.brevo.com',
-                path,
-                headers: { 'accept': 'application/json', 'api-key': API_KEY }
+                method: 'GET', hostname: 'api.brevo.com', path,
+                headers: { 'accept':'application/json', 'api-key': API_KEY }
               }, res => {
-                let data = '';
-                res.on('data', c => data += c);
+                let data = ''; res.on('data', c => data += c);
                 res.on('end', () => {
                   if (res.statusCode >= 300) return reject(new Error(`GET ${path}: ${res.statusCode} ${data}`));
                   try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
@@ -71,46 +69,31 @@ jobs:
             const payload = JSON.stringify(body);
             return new Promise((resolve, reject) => {
               const req = https.request({
-                method: 'POST',
-                hostname: 'api.brevo.com',
-                path,
-                headers: {
-                  'Content-Type': 'application/json',
-                  'api-key': API_KEY,
-                  'Content-Length': Buffer.byteLength(payload)
-                }
+                method: 'POST', hostname: 'api.brevo.com', path,
+                headers: { 'Content-Type':'application/json', 'api-key': API_KEY, 'Content-Length': Buffer.byteLength(payload) }
               }, res => {
-                let data = '';
-                res.on('data', c => data += c);
+                let data = ''; res.on('data', c => data += c);
                 res.on('end', () => {
                   if (res.statusCode >= 300) return reject(new Error(`POST ${path}: ${res.statusCode} ${data}`));
                   resolve(data);
                 });
               });
-              req.on('error', reject);
-              req.write(payload); req.end();
+              req.on('error', reject); req.write(payload); req.end();
             });
           }
 
-          // 1) Load curated items
+          // === Carregar items (playlist) ===
           let items = [];
           try {
-            items = JSON.parse(fs.readFileSync('docs/playlist.json', 'utf8'));
-          } catch (e) {
-            console.error('Failed to read docs/playlist.json:', e.message);
-            process.exit(1);
-          }
-          if (!Array.isArray(items) || items.length === 0) {
-            console.log('No items to send today. Exiting gracefully.');
-            process.exit(0);
-          }
+            items = JSON.parse(fs.readFileSync('docs/playlist.json','utf8'));
+          } catch (e) { console.error('Failed to read docs/playlist.json:', e.message); process.exit(1); }
+          if (!Array.isArray(items) || !items.length) { console.log('No items to send today. Exiting.'); process.exit(0); }
 
           const today = new Date().toISOString().slice(0,10);
 
-          // 2) Fetch all contacts from the list (paginate)
+          // === Buscar emails da lista ===
           async function getAllEmails(listId) {
-            const limit = 500;
-            let offset = 0, emails = [];
+            const limit = 500; let offset = 0, emails = [];
             while (true) {
               const res = await brevoGet(`/v3/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`);
               const page = (res.contacts || []).map(c => c.email).filter(Boolean);
@@ -118,40 +101,87 @@ jobs:
               if (page.length < limit) break;
               offset += limit;
             }
-            // de-dup & basic sanity
             return [...new Set(emails.map(e => String(e).trim().toLowerCase()))];
+          }
+
+          // === Template minimalista (com emoji por categoria) ===
+          function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+          function catEmoji(cat){
+            const m=(cat||'').toLowerCase();
+            if (m.includes('titan')||m.includes('startup')) return '🚀';
+            if (m.includes('ai')||m.includes('data')||m.includes('research')) return '🧠';
+            if (m.includes('program')||m.includes('engineer')||m.includes('dev')) return '🛠️';
+            if (m.includes('science')||m.includes('futur')) return '🧪';
+            if (m.includes('design')||m.includes('ux')) return '🎨';
+            if (m.includes('security')||m.includes('privacy')) return '🔐';
+            return '🧭';
+          }
+          function guessCategory(i){
+            const t = `${i.title} ${(i.summary_long||i.summary||'')}`.toLowerCase();
+            if (/ai|llm|model|dataset|benchmark|ml/.test(t)) return 'AI, Data & Research';
+            if (/gpu|chip|semiconductor|nvidia|tpu|foundry/.test(t)) return 'Tech Titans & Upstarts';
+            if (/cloud|aws|gcp|azure|kafka|spark|postgres|sdk|api/.test(t)) return 'Engineering & Programming';
+            if (/quantum|robot|space|fusion|bio|materials/.test(t)) return 'Science & Futuristic Tech';
+            if (/design|ux|ui|accessibility|typography/.test(t)) return 'Design & UX';
+            if (/breach|ransom|privacy|gdpr|security/.test(t)) return 'Security & Privacy';
+            return 'Tech';
+          }
+          function stripHtml(s){ return String(s).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
+
+          const brand = 'Kernelcut';
+          const html = `
+          <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:720px;margin:0 auto;padding:24px;line-height:1.6;color:#111;">
+            <header style="margin-bottom:16px;">
+              <div style="font-size:14px;letter-spacing:.02em;color:#666;">${brand}</div>
+              <div style="font-size:12px;color:#888;">Daily Tech Digest — ${today} (UTC)</div>
+            </header>
+            ${items.map(i=>{
+              const cat = i.category || guessCategory(i);
+              const emoji = i.emoji || catEmoji(cat);
+              const sourceLine = [i.section,i.source,i.author,i.date,i.region].filter(Boolean).join(' · ');
+              return `
+                <section style="margin:18px 0 18px;">
+                  <div style="font-size:13px;color:#888;">${emoji} ${escapeHtml(cat)}</div>
+                  <h3 style="margin:6px 0 6px;font-size:18px;font-weight:600;line-height:1.35;">
+                    <a href="${i.url}" style="text-decoration:underline;color:#111;">${escapeHtml(i.title)}</a>
+                  </h3>
+                  <div style="font-size:12px;color:#777;margin:0 0 6px;">${escapeHtml(sourceLine)}</div>
+                  <p style="margin:0 0 10px;color:#222;">${i.summary_long||i.summary||''}</p>
+                  ${i.why ? `<div style="font-size:13px;margin:6px 0;"><strong>Why it matters:</strong> ${escapeHtml(i.why)}</div>` : ``}
+                  ${i.next ? `<div style="font-size:13px;margin:4px 0;"><strong>What’s next:</strong> ${escapeHtml(i.next)}</div>` : ``}
+                </section>
+                <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
+              `;
+            }).join('')}
+            <footer style="font-size:12px;color:#888;margin-top:20px;">
+              Sent at 06:00 UTC · Unsubscribe any time.<br>
+              © ${new Date().getFullYear()} Kernelcut
+            </footer>
+          </div>`;
+
+          // === Envio 1-a-1 ===
+          async function sendOne(email) {
+            const payload = {
+              subject: `Kernelcut · ${today}`,
+              sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+              to: [{ email }],
+              htmlContent: html,
+              textContent: stripHtml(html),
+              headers: { "List-Unsubscribe": "<mailto:unsubscribe@kernelcut.com>" } // substitui quando tiveres uma página
+            };
+            return brevoPost('/v3/smtp/email', payload);
           }
 
           (async () => {
             const recipients = await getAllEmails(LIST_ID);
-            if (!recipients.length) {
-              console.log('No subscribers yet. Exiting gracefully.');
-              return;
+            if (!recipients.length) { console.log('No subscribers yet. Exiting.'); return; }
+            console.log(`[Kernelcut] sender: ${SENDER_EMAIL} • recipients: ${recipients.length}`);
+
+            let sent=0, failed=0;
+            for (const r of recipients) {
+              try { await sendOne(r); sent++; }
+              catch (e) { failed++; console.error('FAIL', r, e.message||e); }
             }
-
-            // 3) Build email HTML
-            const html =
-              `<div style="font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:720px;margin:auto;padding:24px;">
-                 <h1 style="margin:0 0 16px 0;">Kernelcut · ${today} (UTC)</h1>
-                 ${items.map(i => `
-                   <h3 style="margin:18px 0 8px 0;">
-                     <a href="${i.url}" style="text-decoration:underline;color:#111;">${i.title}</a>
-                   </h3>
-                   <p style="margin:0 0 20px 0;color:#333;line-height:1.6;">${i.summary_long}</p>
-                 `).join('')}
-               </div>`;
-
-            // 4) Prepare transactional send (to many "to" recipients)
-            const to = recipients.map(email => ({ email }));
-
-            const payload = {
-              subject: `Kernelcut · ${today}`,
-              sender: { name: 'Kernelcut', email: SENDER_EMAIL },
-              htmlContent: html,
-              to
-            };
-
-            const result = await brevoPost('/v3/smtp/email', payload);
-            console.log('Brevo response:', result);
+            console.log(`Summary: sent=${sent}, failed=${failed}, total=${recipients.length}`);
           })().catch(err => { console.error(err); process.exit(1); });
           NODE
