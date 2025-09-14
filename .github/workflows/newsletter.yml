@@ -19,18 +19,23 @@ jobs:
           node-version: '20'
 
       - name: Install deps
-        run: npm ci
+        run: npm ci --no-audit --no-fund
 
-      # (safety) regenerate docs/playlist.json before sending
+      # (importante) gerar sempre o docs/playlist.json antes de enviar
       - name: Build feed
         run: node scripts/buildFeed.mjs
+
+      # debug rápido (mostra nº de items e 1º item)
+      - name: Debug feed output
+        run: |
+          node -e "const f=require('fs');const a=JSON.parse(f.readFileSync('docs/playlist.json','utf8'));console.log('COUNT',a.length);console.log('FIRST',a[0]||{})"
 
       - name: Send daily digest via Brevo (one-by-one, minimal template)
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
-          SENDER_EMAIL:  ${{ secrets.SENDER_EMAIL }}   # e.g., news@kernelcut.com (authenticated domain)
-          SENDER_NAME:   ${{ secrets.SENDER_NAME }}    # optional (fallback = "Kernelcut")
+          SENDER_EMAIL:  ${{ secrets.SENDER_EMAIL }}   # ex.: news@kernelcut.com (domínio autenticado)
+          SENDER_NAME:   ${{ secrets.SENDER_NAME }}    # opcional (fallback = "Kernelcut")
         run: |
           node - <<'NODE'
           const fs = require('fs');
@@ -40,7 +45,7 @@ jobs:
           const RAW_KEY   = process.env.BREVO_API_KEY || '';
           const API_KEY   = RAW_KEY.replace(/[\r\n\t"'\u00A0]/g, '').trim();
           const RAW_LIST  = String(process.env.BREVO_LIST_ID || '').trim();
-          const LIST_ID   = RAW_LIST.replace(/[^\d]/g, ''); // digits only
+          const LIST_ID   = RAW_LIST.replace(/[^\d]/g, ''); // só dígitos
           const SENDER_EMAIL = (process.env.SENDER_EMAIL || '').trim();
           const SENDER_NAME  = (process.env.SENDER_NAME  || 'Kernelcut').trim();
 
@@ -48,7 +53,7 @@ jobs:
             if (!val) { console.error(`Missing required env: ${label}`); process.exit(1); }
           }
           if (!/^[A-Za-z0-9_-]+$/.test(API_KEY)) {
-            console.error('BREVO_API_KEY contains invalid characters (spaces/newlines/quotes). Fix the secret.');
+            console.error('BREVO_API_KEY contém caracteres inválidos (espaços/aspas/newlines). Corrige o secret.');
             process.exit(1);
           }
 
@@ -86,7 +91,7 @@ jobs:
           }
           const wait = ms => new Promise(r => setTimeout(r, ms));
 
-          // === Load curated items ===
+          // === Carregar items (playlist) ===
           let items = [];
           try {
             items = JSON.parse(fs.readFileSync('docs/playlist.json','utf8'));
@@ -95,7 +100,7 @@ jobs:
 
           const today = new Date().toISOString().slice(0,10);
 
-          // === Fetch all contacts from list ===
+          // === Buscar emails da lista ===
           async function getAllEmails(listId) {
             const limit = 500; let offset = 0, emails = [];
             while (true) {
@@ -108,7 +113,7 @@ jobs:
             return [...new Set(emails.map(e => String(e).trim().toLowerCase()))];
           }
 
-          // === Minimal email template (no top gap, with preheader) ===
+          // === Template minimalista (com emoji por categoria) ===
           function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
           function catEmoji(cat){
             const m=(cat||'').toLowerCase();
@@ -172,7 +177,7 @@ jobs:
             </div>
           </div>`;
 
-          // === Send one-by-one with small throttle ===
+          // === Envio 1-a-1 ===
           async function sendOne(email) {
             const payload = {
               subject: `Kernelcut · ${today}`,
@@ -183,7 +188,9 @@ jobs:
               headers: {
                 "List-Unsubscribe": "<mailto:unsubscribe@kernelcut.com>, <https://kernelcut.com/unsubscribe>"
               },
-              replyTo: [{ email: SENDER_EMAIL, name: SENDER_NAME }]
+              // *** FIX CRÍTICO: Brevo não aceita array aqui. Usa string ou objeto. ***
+              replyTo: SENDER_EMAIL
+              // alternativa: replyTo: { email: SENDER_EMAIL, name: SENDER_NAME }
             };
             return brevoPost('/v3/smtp/email', payload);
           }
@@ -197,7 +204,7 @@ jobs:
             for (const r of recipients) {
               try { await sendOne(r); sent++; }
               catch (e) { failed++; console.error('FAIL', r, e.message||e); }
-              await wait(200); // tiny throttle
+              await wait(200); // pequeno throttle
             }
             console.log(`Summary: sent=${sent}, failed=${failed}, total=${recipients.length}`);
           })().catch(err => { console.error(err); process.exit(1); });
