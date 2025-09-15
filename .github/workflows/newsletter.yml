@@ -2,8 +2,8 @@ name: newsletter
 
 on:
   schedule:
-    - cron: '0 6 * * *'   # every day at 06:00 UTC
-  workflow_dispatch:      # allow manual test runs
+    - cron: '0 6 * * *'           # every day at 06:00 UTC
+  workflow_dispatch:               # allow manual test runs
 
 jobs:
   send:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -21,191 +21,18 @@ jobs:
       - name: Install deps
         run: npm ci --no-audit --no-fund
 
-      # (importante) gerar sempre o docs/playlist.json antes de enviar
       - name: Build feed
         run: node scripts/buildFeed.mjs
 
-      # debug rápido (mostra nº de items e 1º item)
       - name: Debug feed output
         run: |
           node -e "const f=require('fs');const a=JSON.parse(f.readFileSync('docs/playlist.json','utf8'));console.log('COUNT',a.length);console.log('FIRST',a[0]||{})"
 
-      - name: Send daily digest via Brevo (one-by-one, minimal template)
+      # Send as a Brevo campaign (robust + visível no painel)
+      - name: Send daily digest via Brevo (campaign to list)
         env:
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-          BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
-          SENDER_EMAIL:  ${{ secrets.SENDER_EMAIL }}   # ex.: news@kernelcut.com (domínio autenticado)
-          SENDER_NAME:   ${{ secrets.SENDER_NAME }}    # opcional (fallback = "Kernelcut")
-        run: |
-          node - <<'NODE'
-          const fs = require('fs');
-          const https = require('https');
-
-          // === ENV & guards ===
-          const RAW_KEY   = process.env.BREVO_API_KEY || '';
-          const API_KEY   = RAW_KEY.replace(/[\r\n\t"'\u00A0]/g, '').trim();
-          const RAW_LIST  = String(process.env.BREVO_LIST_ID || '').trim();
-          const LIST_ID   = RAW_LIST.replace(/[^\d]/g, ''); // só dígitos
-          const SENDER_EMAIL = (process.env.SENDER_EMAIL || '').trim();
-          const SENDER_NAME  = (process.env.SENDER_NAME  || 'Kernelcut').trim();
-
-          for (const [label, val] of [['BREVO_API_KEY',API_KEY],['BREVO_LIST_ID',LIST_ID],['SENDER_EMAIL',SENDER_EMAIL]]) {
-            if (!val) { console.error(`Missing required env: ${label}`); process.exit(1); }
-          }
-          if (!/^[A-Za-z0-9_-]+$/.test(API_KEY)) {
-            console.error('BREVO_API_KEY contém caracteres inválidos (espaços/aspas/newlines). Corrige o secret.');
-            process.exit(1);
-          }
-
-          // === HTTP helpers ===
-          function brevoGet(path) {
-            return new Promise((resolve, reject) => {
-              const req = https.request({
-                method: 'GET', hostname: 'api.brevo.com', path,
-                headers: { accept:'application/json', 'api-key': API_KEY }
-              }, res => {
-                let data = ''; res.on('data', c => data += c);
-                res.on('end', () => {
-                  if (res.statusCode >= 300) return reject(new Error(`GET ${path}: ${res.statusCode} ${data}`));
-                  try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
-                });
-              });
-              req.on('error', reject); req.end();
-            });
-          }
-          function brevoPost(path, body) {
-            const payload = JSON.stringify(body);
-            return new Promise((resolve, reject) => {
-              const req = https.request({
-                method: 'POST', hostname: 'api.brevo.com', path,
-                headers: { 'Content-Type':'application/json', 'api-key': API_KEY, 'Content-Length': Buffer.byteLength(payload) }
-              }, res => {
-                let data = ''; res.on('data', c => data += c);
-                res.on('end', () => {
-                  if (res.statusCode >= 300) return reject(new Error(`POST ${path}: ${res.statusCode} ${data}`));
-                  resolve(data);
-                });
-              });
-              req.on('error', reject); req.write(payload); req.end();
-            });
-          }
-          const wait = ms => new Promise(r => setTimeout(r, ms));
-
-          // === Carregar items (playlist) ===
-          let items = [];
-          try {
-            items = JSON.parse(fs.readFileSync('docs/playlist.json','utf8'));
-          } catch (e) { console.error('Failed to read docs/playlist.json:', e.message); process.exit(1); }
-          if (!Array.isArray(items) || !items.length) { console.log('No items to send today. Exiting.'); process.exit(0); }
-
-          const today = new Date().toISOString().slice(0,10);
-
-          // === Buscar emails da lista ===
-          async function getAllEmails(listId) {
-            const limit = 500; let offset = 0, emails = [];
-            while (true) {
-              const res = await brevoGet(`/v3/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`);
-              const page = (res.contacts || []).map(c => c.email).filter(Boolean);
-              emails.push(...page);
-              if (page.length < limit) break;
-              offset += limit;
-            }
-            return [...new Set(emails.map(e => String(e).trim().toLowerCase()))];
-          }
-
-          // === Template minimalista (com emoji por categoria) ===
-          function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
-          function catEmoji(cat){
-            const m=(cat||'').toLowerCase();
-            if (m.includes('titan')||m.includes('startup')) return '🚀';
-            if (m.includes('ai')||m.includes('data')||m.includes('research')) return '🧠';
-            if (m.includes('program')||m.includes('engineer')||m.includes('dev')) return '🛠️';
-            if (m.includes('science')||m.includes('futur')) return '🧪';
-            if (m.includes('design')||m.includes('ux')) return '🎨';
-            if (m.includes('security')||m.includes('privacy')) return '🔐';
-            return '🧭';
-          }
-          function guessCategory(i){
-            const t = `${i.title} ${(i.summary_long||i.summary||'')}`.toLowerCase();
-            if (/ai|llm|model|dataset|benchmark|ml/.test(t)) return 'AI, Data & Research';
-            if (/gpu|chip|semiconductor|nvidia|tpu|foundry/.test(t)) return 'Tech Titans & Upstarts';
-            if (/cloud|aws|gcp|azure|kafka|spark|postgres|sdk|api/.test(t)) return 'Engineering & Programming';
-            if (/quantum|robot|space|fusion|bio|materials/.test(t)) return 'Science & Futuristic Tech';
-            if (/design|ux|ui|accessibility|typography/.test(t)) return 'Design & UX';
-            if (/breach|ransom|privacy|gdpr|security/.test(t)) return 'Security & Privacy';
-            return 'Tech';
-          }
-          function stripHtml(s){ return String(s).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
-
-          const brand = 'Kernelcut';
-          const preheader = 'Long-form summaries. Handpicked hard tech. 06:00 UTC.';
-          const html = `
-          <div style="background:#fff;margin:0 auto;max-width:720px;">
-            <!-- preheader (hidden) -->
-            <div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0;">
-              ${escapeHtml(preheader)}
-            </div>
-            <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;color:#111;padding:16px 24px;margin:0;mso-line-height-rule:exactly;">
-              <div style="margin:0;padding:0;">
-                <div style="font-size:15px;letter-spacing:.01em;color:#555;margin:0;">${brand}</div>
-                <div style="font-size:12px;color:#888;margin:0 0 8px 0;">Daily Tech Digest — ${today} (UTC)</div>
-              </div>
-
-              ${items.map(i=>{
-                const cat = i.category || guessCategory(i);
-                const emoji = i.emoji || catEmoji(cat);
-                const sourceLine = [i.section,i.source,i.author,i.date,i.region].filter(Boolean).join(' · ');
-                return `
-                  <section style="margin:14px 0 14px;">
-                    <div style="font-size:13px;color:#888;margin:0;">${emoji} ${escapeHtml(cat)}</div>
-                    <h3 style="margin:4px 0 6px 0;font-size:18px;font-weight:600;line-height:1.35;">
-                      <a href="${i.url}" style="text-decoration:underline;color:#111;">${escapeHtml(i.title)}</a>
-                    </h3>
-                    <div style="font-size:12px;color:#777;margin:0 0 6px;">${escapeHtml(sourceLine)}</div>
-                    <p style="margin:0 0 8px 0;color:#222;">${i.summary_long||i.summary||''}</p>
-                    ${i.why ? `<div style="font-size:13px;margin:4px 0;"><strong>Why it matters:</strong> ${escapeHtml(i.why)}</div>` : ``}
-                    ${i.next ? `<div style="font-size:13px;margin:2px 0 0;"><strong>What’s next:</strong> ${escapeHtml(i.next)}</div>` : ``}
-                  </section>
-                  <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
-                `;
-              }).join('')}
-
-              <footer style="font-size:12px;color:#888;margin-top:14px;">
-                Sent at 06:00 UTC · Unsubscribe any time.<br>
-                © ${new Date().getFullYear()} Kernelcut
-              </footer>
-            </div>
-          </div>`;
-
-          // === Envio 1-a-1 ===
-          async function sendOne(email) {
-            const payload = {
-              subject: `Kernelcut · ${today}`,
-              sender: { name: SENDER_NAME, email: SENDER_EMAIL },
-              to: [{ email }],
-              htmlContent: html,
-              textContent: stripHtml(html),
-              headers: {
-                "List-Unsubscribe": "<mailto:unsubscribe@kernelcut.com>, <https://kernelcut.com/unsubscribe>"
-              },
-              // *** FIX CRÍTICO: Brevo não aceita array aqui. Usa string ou objeto. ***
-              replyTo: SENDER_EMAIL
-              // alternativa: replyTo: { email: SENDER_EMAIL, name: SENDER_NAME }
-            };
-            return brevoPost('/v3/smtp/email', payload);
-          }
-
-          (async () => {
-            const recipients = await getAllEmails(LIST_ID);
-            if (!recipients.length) { console.log('No subscribers yet. Exiting.'); return; }
-            console.log(`[Kernelcut] sender: ${SENDER_EMAIL} • recipients: ${recipients.length}`);
-
-            let sent=0, failed=0;
-            for (const r of recipients) {
-              try { await sendOne(r); sent++; }
-              catch (e) { failed++; console.error('FAIL', r, e.message||e); }
-              await wait(200); // pequeno throttle
-            }
-            console.log(`Summary: sent=${sent}, failed=${failed}, total=${recipients.length}`);
-          })().catch(err => { console.error(err); process.exit(1); });
-          NODE
+          BREVO_API_KEY:       ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID:       ${{ secrets.BREVO_LIST_ID }}        # deve ser "3"
+          BREVO_SENDER_EMAIL:  ${{ secrets.SENDER_EMAIL }}         # podes mapear dos teus secrets atuais
+          BREVO_SENDER_NAME:   ${{ secrets.SENDER_NAME }}
+        run: node scripts/sendBrevo.mjs

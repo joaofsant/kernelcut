@@ -1,13 +1,13 @@
 {
   "name": "kernelcut",
-  "version": "1.0.0",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
   "scripts": {
-    "build:feed": "node scripts/buildFeed.mjs"
+    "build:feed": "node scripts/buildFeed.mjs",
+    "send:campaign": "node scripts/sendBrevo.mjs"
   },
   "dependencies": {
-    "rss-parser": "^3.13.0",
-    "html-to-text": "^9.0.5"
+    "rss-parser": "^3.13.0"
   }
 }
