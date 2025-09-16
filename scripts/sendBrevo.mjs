@@ -72,6 +72,17 @@ const preheader = 'Long-form summaries. Handpicked hard tech. 06:00 UTC.';
 const brand = 'Kernelcut';
 
 function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function stripBareUrls(s=''){
+  return String(s)
+    // markdown-style links [text](url) -> keep text
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi, '$1')
+    // plain URLs http(s)://... or www. -> remove
+    .replace(/\bhttps?:\/\/[^\s<)]+/gi, '')
+    .replace(/\bwww\.[^\s<)]+/gi, '')
+    .replace(/\s{2,}/g,' ')
+    .trim();
+}
+
 function catEmoji(cat){
   const m=(cat||'').toLowerCase();
   if (m.includes('startup')||m.includes('titan')) return '🚀';
@@ -93,31 +104,35 @@ function guessCategory(i){
   return 'Tech';
 }
 
+const preheader = 'Long-form summaries. Handpicked hard tech. 06:00 UTC.';
+const brand = 'Kernelcut';
+
 const html = `
 <div style="background:#fff;margin:0 auto;max-width:720px;">
   <div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0;">
     ${escapeHtml(preheader)}
   </div>
   <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;color:#111;padding:16px 24px;margin:0;mso-line-height-rule:exactly;">
-    <div style="margin:0;padding:0;">
-      <div style="font-size:15px;letter-spacing:.01em;color:#555;margin:0;">${brand}</div>
-      <div style="font-size:12px;color:#888;margin:0 0 8px 0;">Daily Tech Digest — ${today} (UTC)</div>
+    <div style="margin:0 0 8px 0;">
+      <div style="font-size:15px;letter-spacing:.01em;color:#555;">${brand}</div>
+      <div style="font-size:12px;color:#888;">Daily Tech Digest — ${today} (UTC)</div>
     </div>
 
     ${items.map(i=>{
       const cat = i.category || guessCategory(i);
       const emoji = i.emoji || catEmoji(cat);
-      const sourceLine = [i.section,i.source,i.author,i.date,i.region].filter(Boolean).join(' · ');
+      // clean, no date here:
+      const meta = [i.source, i.region].filter(Boolean).join(' · ');
       const title = escapeHtml(i.title||'');
       const link = i.url ? `<a href="${i.url}" style="text-decoration:underline;color:#111;">${title}</a>` : title;
+      const body = stripBareUrls(i.summary_long || i.summary || '');
+
       return `
         <section style="margin:14px 0 14px;">
-          <div style="font-size:13px;color:#888;margin:0;">${emoji} ${escapeHtml(cat)}</div>
+          <div style="font-size:13px;color:#888;">${emoji} ${escapeHtml(cat)}</div>
           <h3 style="margin:4px 0 6px 0;font-size:18px;font-weight:600;line-height:1.35;">${link}</h3>
-          <div style="font-size:12px;color:#777;margin:0 0 6px;">${escapeHtml(sourceLine)}</div>
-          <p style="margin:0 0 8px 0;color:#222;">${i.summary_long||i.summary||''}</p>
-          ${i.why ? `<div style="font-size:13px;margin:4px 0;"><strong>Why it matters:</strong> ${escapeHtml(i.why)}</div>` : ``}
-          ${i.next ? `<div style="font-size:13px;margin:2px 0 0;"><strong>What’s next:</strong> ${escapeHtml(i.next)}</div>` : ``}
+          ${meta ? `<div style="font-size:12px;color:#777;margin:0 0 6px;">${escapeHtml(meta)}</div>` : ``}
+          <p style="margin:0 0 8px 0;color:#222;">${escapeHtml(body)}</p>
         </section>
         <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
       `;
