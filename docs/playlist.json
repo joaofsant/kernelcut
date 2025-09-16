@@ -1,38 +1,38 @@
 [
   {
-    "id": "bigtech:parts shortage is the latest problem to hit general motors p:2025-09-15T14:38:52.000Z",
-    "title": "Parts shortage is the latest problem to hit General Motors production",
-    "url": "https://arstechnica.com/cars/2025/09/parts-shortage-is-the-latest-problem-to-hit-general-motors-production/",
+    "id": "bigtech:northrop grummans new spacecraft is a real chonker:2025-09-15T22:22:53.000Z",
+    "title": "Northrop Grumman’s new spacecraft is a real chonker",
+    "url": "https://arstechnica.com/space/2025/09/northrop-grummans-new-spacecraft-is-a-real-chonker/",
     "category_id": "bigtech",
     "region": "Global",
     "source": "arstechnica.com",
-    "author": "\n                    Jonathan M. Gitlin\n                ",
-    "published_at": "2025-09-15T14:38:52.000Z",
-    "summary_long": "General Motors will temporarily lay off workers at its Wentzville assembly plant in Missouri. According to a letter sent to employees by the head of the plant and the head of the local union, a shortage of parts is the culprit, and as a result, the factory will see \"a temporary layoff from September 29–October 19.\" The plant is about 45 minutes west of St. Louis and employs more than 4,000 people to assemble midsize pickup trucks for Chevrolet and GMC, as well as full-size vans. Not every employee will be laid off—\"skilled trades, stamping, body shop, final process and those groups that support these departments\" may still have work. Source: arstechnica.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "author": "\n                    Stephen Clark\n                ",
+    "published_at": "2025-09-15T22:22:53.000Z",
+    "summary_long": "What happens when you use a SpaceX Falcon 9 rocket to launch Northrop Grumman's Cygnus supply ship? A record-setting resupply mission to the International Space Station. The first flight of Northrop's upgraded Cygnus spacecraft, called Cygnus XL, is on its way to the international research lab after launching Sunday evening from Cape Canaveral Space Force Station, Florida. This mission, known as NG-23, is set to arrive at the ISS early Wednesday with 10,827 pounds (4,911 kilograms) of cargo to sustain the lab and its seven-person crew. Source: arstechnica.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
-    "id": "bigtech:china rules that nvidia violated its antitrust laws:2025-09-15T13:30:55.000Z",
-    "title": "China rules that Nvidia violated its antitrust laws",
-    "url": "https://arstechnica.com/tech-policy/2025/09/china-rules-that-nvidia-violated-its-antitrust-laws/",
+    "id": "bigtech:google releases vaultgemma its first privacypreserving llm:2025-09-15T21:04:04.000Z",
+    "title": "Google releases VaultGemma, its first privacy-preserving LLM",
+    "url": "https://arstechnica.com/ai/2025/09/google-releases-vaultgemma-its-first-privacy-preserving-llm/",
     "category_id": "bigtech",
     "region": "Global",
     "source": "arstechnica.com",
-    "author": "\n                    Zijing Wu and Cheng Leng, Financial Times\n                ",
-    "published_at": "2025-09-15T13:30:55.000Z",
-    "summary_long": "A Chinese regulator has found Nvidia violated the country’s antitrust law, in a preliminary finding against the world’s most valuable chipmaker. Nvidia had failed to fully comply with provisions outlined when it acquired Mellanox Technologies, an Israeli-US supplier of networking products, China’s State Administration for Market Regulation (SAMR) said on Monday. Beijing conditionally approved the US chipmaker’s acquisition of Mellanox in 2020. Monday’s statement came as US and Chinese officials prepared for more talks in Madrid over trade, with a tariff truce between the world’s two largest economies set to expire in November. Source: arstechnica.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "author": "\n                    Ryan Whitwam\n                ",
+    "published_at": "2025-09-15T21:04:04.000Z",
+    "summary_long": "The companies seeking to build larger AI models have been increasingly stymied by a lack of high-quality training data. As tech firms scour the web for more data to feed their models, they could increasingly rely on potentially sensitive user data. A team at Google Research is exploring new techniques to make the resulting large language models (LLMs) less likely to \"memorize\" any of that content. LLMs have non-deterministic outputs, meaning you can't exactly predict what they'll say. Source: arstechnica.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
-    "id": "bigtech:boeing faces 31m fine for door plug blowout hundreds of safe:2025-09-15T17:57:23.000Z",
-    "title": "Boeing faces $3.1M fine for door plug blowout, hundreds of safety violations",
-    "url": "https://arstechnica.com/tech-policy/2025/09/boeing-faces-3-1m-fine-for-door-plug-blowout-hundreds-of-safety-violations/",
+    "id": "bigtech:internet archives big battle with music publishers ends in s:2025-09-15T20:52:01.000Z",
+    "title": "Internet Archive’s big battle with music publishers ends in settlement",
+    "url": "https://arstechnica.com/tech-policy/2025/09/internet-archives-big-battle-with-music-publishers-ends-in-settlement/",
     "category_id": "bigtech",
     "region": "Global",
     "source": "arstechnica.com",
-    "author": "\n                    Jon Brodkin\n                ",
-    "published_at": "2025-09-15T17:57:23.000Z",
-    "summary_long": "The Federal Aviation Administration on Friday proposed fines of $3.1 million against Boeing for various safety violations related to the January 2024 door plug blowout and what the FAA called \"interference with safety officials' independence.\" An FAA statement said the proposed fine covers \"safety violations that occurred from September 2023 through February 2024,\" and is the \"maximum statutory civil penalty authority consistent with law.\" Boeing, which reported $22.7 billion in revenue and a net loss of $612 million last quarter, has 30 days to file a response with the agency. \"The FAA identified hundreds of quality system violations at Boeing's 737 factory in Renton, Washington, and Boeing subcontractor Spirit AeroSystems' 737 factory in Wichita, Kansas. Additionally, Boeing presented two unairworthy aircraft to the FAA for airworthiness certificates and failed to follow its quality system,\" the FAA said. Read full article Comments Source: arstechnica.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society.",
+    "author": "\n                    Ashley Belanger\n                ",
+    "published_at": "2025-09-15T20:52:01.000Z",
+    "summary_long": "A settlement has been reached in a lawsuit where music publishers sued the Internet Archive over the Great 78 Project, an effort to preserve early music recordings that only exist on brittle shellac records. No details of the settlement have so far been released, but a court filing on Monday confirmed that the Internet Archive and UMG Recordings, Capitol Records, Sony Music Entertainment, and other record labels \"have settled this matter.\" More details may come in the next 45 days, when parties must submit filings to officially dismiss the lawsuit, but it's unlikely the settlement amount will be publicly disclosed. Days before the settlement was announced, record labels had indicated that everyone but the Internet Archive and its founder, Brewster Kahle, had agreed to sign a joint settlement, seemingly including the Great 78 Project's recording engineer George Blood, who was also a target of the litigation. But in the days since, IA has gotten on board, posting a blog confirming…",
     "tags": []
   },
   {
@@ -60,15 +60,63 @@
     "tags": []
   },
   {
-    "id": "fintech:strategy adds 525 bitcoin in latest purchase:2025-09-15T12:06:59.000Z",
-    "title": "Strategy Adds 525 Bitcoin in Latest Purchase",
-    "url": "https://www.coindesk.com/markets/2025/09/15/strategy-adds-525-bitcoin-in-latest-purchase",
+    "id": "ai_data:justeva a toolkit to evaluate llm fairness in legal knowledg:2025-09-15T16:31:26.000Z",
+    "title": "JustEva: A Toolkit to Evaluate LLM Fairness in Legal Knowledge Inference",
+    "url": "http://arxiv.org/abs/2509.12104v1",
+    "category_id": "ai_data",
+    "region": "Global",
+    "source": "arxiv.org",
+    "author": "Zongyue Xue",
+    "published_at": "2025-09-15T16:31:26.000Z",
+    "summary_long": "The integration of Large Language Models (LLMs) into legal practice raises pressing concerns about judicial fairness, particularly due to the nature of their \"black-box\" processes. This study introduces JustEva, a comprehensive, open-source evaluation toolkit designed to measure LLM fairness in legal tasks. JustEva features several advantages: (1) a structured label system covering 65 extra-legal factors; (2) three core fairness metrics - inconsistency, bias, and imbalanced inaccuracy; (3) robust statistical inference methods; and (4) informative visualizations. The toolkit supports two types of experiments, enabling a complete evaluation workflow: (1) generating structured outputs from LLMs using a provided dataset, and (2) conducting statistical analysis and inference on LLMs' outputs through regression and other statistical methods. Source: arxiv.org. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "space:nasa sets launch coverage for space weather missions:2025-09-15T21:29:53.000Z",
+    "title": "NASA Sets Launch Coverage for Space Weather Missions",
+    "url": "https://www.nasa.gov/news-release/nasa-sets-launch-coverage-for-space-weather-missions/",
+    "category_id": "space",
+    "region": "Global",
+    "source": "www.nasa.gov",
+    "author": "Jessica Taveau",
+    "published_at": "2025-09-15T21:29:53.000Z",
+    "summary_long": "From left to right, NASA’s Carruthers Geocorona Observatory, IMAP (Interstellar Mapping and Acceleration Probe), and the National Oceanic and Atmospheric Administration’s (NOAA) Space Weather Follow On-Lagrange 1 (SWFO-L1) missions will map our Sun’s influence across the solar system in new ways. Credit: NASA NASA will provide live coverage of prelaunch and launch activities for an observatory designed to study space weather and explore and map the boundaries of our solar neighborhood. Launching with IMAP (Interstellar Mapping and Acceleration Probe) are two rideshare missions, NASA’s Carruthers Geocorona Observatory and the National Oceanic and Atmospheric Administration’s (NOAA) Space Weather Follow On-Lagrange 1 (SWFO-L1), both of which will provide insight into space weather and its impacts at Earth and across the solar system. Liftoff of the missions on a SpaceX Falcon 9 rocket is targeted for 7:32 a.m. Source: www.nasa.gov. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "ai_data:mmore massive multimodal open rag extraction:2025-09-15T13:56:06.000Z",
+    "title": "MMORE: Massive Multimodal Open RAG & Extraction",
+    "url": "http://arxiv.org/abs/2509.11937v1",
+    "category_id": "ai_data",
+    "region": "Global",
+    "source": "arxiv.org",
+    "author": "Alexandre Sallinen",
+    "published_at": "2025-09-15T13:56:06.000Z",
+    "summary_long": "We introduce MMORE, an open-source pipeline for Massive Multimodal Open RetrievalAugmented Generation and Extraction, designed to ingest, transform, and retrieve knowledge from heterogeneous document formats at scale. MMORE supports more than fifteen file types, including text, tables, images, emails, audio, and video, and processes them into a unified format to enable downstream applications for LLMs. The architecture offers modular, distributed processing, enabling scalable parallelization across CPUs and GPUs. On processing benchmarks, MMORE demonstrates a 3.8-fold speedup over single-node baselines and 40% higher accuracy than Docling on scanned PDFs. Source: arxiv.org. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "fintech:wall street bank citigroup sees ether falling to 4300 by yea:2025-09-15T20:57:22.000Z",
+    "title": "Wall Street Bank Citigroup Sees Ether Falling to $4,300 by Year-End",
+    "url": "https://www.coindesk.com/markets/2025/09/15/wall-street-bank-citigroup-sees-ether-falling-to-usd4-300-by-year-end",
     "category_id": "fintech",
     "region": "Global",
     "source": "www.coindesk.com",
-    "author": "James Van Straten",
-    "published_at": "2025-09-15T12:06:59.000Z",
-    "summary_long": "Strategy (MSTR) said Monday it purchased another 525 BTC for $60.2 million, bringing the company’s total holdings to 638,985 BTC, according to an SEC filing. The latest acquisition was made at an average price of $114,562 per bitcoin, raising the firm’s overall average purchase price to the same level. The announcement came as bitcoin slipped in European trading, falling from nearly $117,000 to about $115,000. So far in 2025, MSTR shares have underperformed bitcoin, gaining just 11% compared with bitcoin’s 23% rise. Source: www.coindesk.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "author": "Will Canny",
+    "published_at": "2025-09-15T20:57:22.000Z",
+    "summary_long": "Wall Street giant Citigroup (C) has launched new ether (ETH) forecasts, calling for $4,300 by year-end, which would be a decline from the current $4,515. That's the base case though. The bank's full assessment is wide enough to drive an army regiment through, with the bull case being $6,400 and the bear case $2,200. The bank analysts said network activity remains the key driver of ether’s value, but much of the recent growth has been on layer-2s, where value “pass-through” to Ethereum’s base layer is unclear. Source: www.coindesk.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "consumer:new york details its plans for online age verification rules:2025-09-15T19:52:23.000Z",
+    "title": "New York details its plans for online age verification rules",
+    "url": "https://www.engadget.com/social-media/new-york-details-its-plans-for-online-age-verification-rules-195223379.html?src=rss",
+    "category_id": "consumer",
+    "region": "Global",
+    "source": "www.engadget.com",
+    "author": "Anna Washenko",
+    "published_at": "2025-09-15T19:52:23.000Z",
+    "summary_long": "Last year, New York joined the wave of states passing legislation aimed at protecting minors using the Internet, particularly social media. Governor Kathy Hochul signed the Stop Addictive Feeds Exploitation (SAFE) for Kids Act and the New York Child Data Protection Act in June 2024. Today, the state's Attorney General Letitia James released more specifics about what the SAFE for Kids Act will entail in practice. Public comment is open until December 1 and the rules must be finalized within a year from that date. Source: www.engadget.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
@@ -84,18 +132,6 @@
     "tags": []
   },
   {
-    "id": "consumer:lg expands its line of xboom earbuds with two new models:2025-09-15T18:22:21.000Z",
-    "title": "LG expands its line of xboom earbuds with two new models",
-    "url": "https://www.engadget.com/audio/headphones/lg-expands-its-line-of-xboom-earbuds-with-two-new-models-182220615.html?src=rss",
-    "category_id": "consumer",
-    "region": "Global",
-    "source": "www.engadget.com",
-    "author": "Lawrence Bonk",
-    "published_at": "2025-09-15T18:22:21.000Z",
-    "summary_long": "LG just announced two new earbuds in its xboom line of audio products, following the launch of the xboom Buds in January. The xboom Buds Plus and Buds Lite (which seems like a relatively confusing name to beer drinkers) both hit store shelves sometime this month. The Buds Plus earbuds are filled with high-tech bells and whistles. These premium headphones boast adaptive EQ that continuously adjusts the sound profile in real time. Source: www.engadget.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
     "id": "ai_data:introducing upgrades to codex:2025-09-15T10:00:00.000Z",
     "title": "Introducing upgrades to Codex",
     "url": "https://openai.com/index/introducing-upgrades-to-codex",
@@ -105,42 +141,6 @@
     "author": "",
     "published_at": "2025-09-15T10:00:00.000Z",
     "summary_long": "Introducing upgrades to Codex Source: openai.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "nextfrontiers:new chip design cuts ai energy use by enabling smarter fpga :2025-09-15T13:01:05.000Z",
-    "title": "New chip design cuts AI energy use by enabling smarter FPGA processing",
-    "url": "https://techxplore.com/news/2025-09-ai-hardware-reimagined-energy.html",
-    "category_id": "nextfrontiers",
-    "region": "Global",
-    "source": "techxplore.com",
-    "author": "",
-    "published_at": "2025-09-15T13:01:05.000Z",
-    "summary_long": "New chip design cuts AI energy use by enabling smarter FPGA processing Source: techxplore.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "policy:lawsuit about whatsapp security:2025-09-15T11:05:45.000Z",
-    "title": "Lawsuit About WhatsApp Security",
-    "url": "https://www.schneier.com/blog/archives/2025/09/lawsuit-about-whatsapp-security.html",
-    "category_id": "policy",
-    "region": "Global",
-    "source": "www.schneier.com",
-    "author": "Bruce Schneier",
-    "published_at": "2025-09-15T11:05:45.000Z",
-    "summary_long": "Attaullah Baig, WhatsApp’s former head of security, has filed a whistleblower lawsuit alleging that Facebook deliberately failed to fix a bunch of security flaws, in violation of its 2019 settlement agreement with the Federal Trade Commission. > The lawsuit, alleging violations of the whistleblower protection provision of the Sarbanes-Oxley Act passed in 2002, said that in 2022, roughly 100,000 WhatsApp users had their accounts hacked every day. By last year, the complaint alleged, as many as 400,000 WhatsApp users were getting locked out of their accounts each day as a result of such account takeovers. > > Baig also allegedly notified superiors that data scraping on the platform was a problem because WhatsApp failed to implement protections that are standard on other messaging platforms, such as Signal and Apple Messages. Source: www.schneier.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "ai_data:how people are using chatgpt:2025-09-15T03:00:00.000Z",
-    "title": "How people are using ChatGPT",
-    "url": "https://openai.com/index/how-people-are-using-chatgpt",
-    "category_id": "ai_data",
-    "region": "Global",
-    "source": "openai.com",
-    "author": "",
-    "published_at": "2025-09-15T03:00:00.000Z",
-    "summary_long": "How people are using ChatGPT Source: openai.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   }
 ]
