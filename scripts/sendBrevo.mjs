@@ -104,9 +104,6 @@ function guessCategory(i){
   return 'Tech';
 }
 
-const preheader = 'Long-form summaries. Handpicked hard tech. 06:00 UTC.';
-const brand = 'Kernelcut';
-
 const html = `
 <div style="background:#fff;margin:0 auto;max-width:720px;">
   <div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0;">
