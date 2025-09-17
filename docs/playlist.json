@@ -1,17 +1,5 @@
 [
   {
-    "id": "bigtech:a record supply load wont reach the international space stat:2025-09-16T23:13:28.000Z",
-    "title": "A record supply load won’t reach the International Space Station as scheduled",
-    "url": "https://arstechnica.com/space/2025/09/a-record-supply-load-wont-reach-the-international-space-station-as-scheduled/",
-    "category_id": "bigtech",
-    "region": "Global",
-    "source": "arstechnica.com",
-    "author": "\n                    Stephen Clark\n                ",
-    "published_at": "2025-09-16T23:13:28.000Z",
-    "summary_long": "A problem with the main engine on Northrop Grumman's Cygnus XL spacecraft will keep it from delivering 11,000 pounds of supplies and experiments to the International Space Station as scheduled on Wednesday. In a statement released Tuesday afternoon, NASA said ground teams are evaluating backup plans that might still allow the Cygnus spacecraft to reach the space station, just not on schedule. The problem arose early Tuesday when the spacecraft's main engine shut down earlier than expected during two burns to boost the ship's orbit for its rendezvous with the ISS, according to NASA. Officials didn't release any other details about the engine problem, but all other systems on the Cygnus XL spacecraft are performing as designed, NASA said. Source: arstechnica.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
     "id": "bigtech:icarus raises 61m to take on spaces warehouse work with embo:2025-09-17T13:00:00.000Z",
     "title": "Icarus raises $6.1M to take on space’s “warehouse work” with embodied-AI robots",
     "url": "https://techcrunch.com/2025/09/17/icarus-raises-6-1m-to-take-on-spaces-warehouse-work-with-embodied-ai-robots/",
@@ -24,15 +12,27 @@
     "tags": []
   },
   {
-    "id": "bigtech:chatgpt may soon require id verification from adults ceo say:2025-09-16T20:09:22.000Z",
-    "title": "ChatGPT may soon require ID verification from adults, CEO says",
-    "url": "https://arstechnica.com/ai/2025/09/chatgpt-may-soon-require-id-verification-from-adults-ceo-says/",
+    "id": "bigtech:a record supply load wont reach the international space stat:2025-09-16T23:13:28.000Z",
+    "title": "A record supply load won’t reach the International Space Station as scheduled",
+    "url": "https://arstechnica.com/space/2025/09/a-record-supply-load-wont-reach-the-international-space-station-as-scheduled/",
     "category_id": "bigtech",
     "region": "Global",
     "source": "arstechnica.com",
-    "author": "\n                    Benj Edwards\n                ",
-    "published_at": "2025-09-16T20:09:22.000Z",
-    "summary_long": "On Tuesday, OpenAI announced plans to develop an automated age-prediction system that will determine whether ChatGPT users are over or under 18, automatically directing younger users to a restricted version of the AI chatbot. The company also confirmed that parental controls will launch by the end of September. In a companion blog post, OpenAI CEO Sam Altman acknowledged the company is explicitly \"prioritizing safety ahead of privacy and freedom for teens,\" even though it means that adults may eventually need to verify their age to use a more unrestricted version of the service. \"In some cases or countries we may also ask for an ID,\" Altman wrote. Source: arstechnica.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "author": "\n                    Stephen Clark\n                ",
+    "published_at": "2025-09-16T23:13:28.000Z",
+    "summary_long": "A problem with the main engine on Northrop Grumman's Cygnus XL spacecraft will keep it from delivering 11,000 pounds of supplies and experiments to the International Space Station as scheduled on Wednesday. In a statement released Tuesday afternoon, NASA said ground teams are evaluating backup plans that might still allow the Cygnus spacecraft to reach the space station, just not on schedule. The problem arose early Tuesday when the spacecraft's main engine shut down earlier than expected during two burns to boost the ship's orbit for its rendezvous with the ISS, according to NASA. Officials didn't release any other details about the engine problem, but all other systems on the Cygnus XL spacecraft are performing as designed, NASA said. Source: arstechnica.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "bigtech:repeat creepy meat problems at boars head plants draw congre:2025-09-16T21:11:39.000Z",
+    "title": "Repeat creepy meat problems at Boar’s Head plants draw congressional scrutiny",
+    "url": "https://arstechnica.com/health/2025/09/repeat-creepy-meat-problems-at-boars-head-plants-draw-congressional-scrutiny/",
+    "category_id": "bigtech",
+    "region": "Global",
+    "source": "arstechnica.com",
+    "author": "\n                    Beth Mole\n                ",
+    "published_at": "2025-09-16T21:11:39.000Z",
+    "summary_long": "Congressional lawmakers are skeptical that the Boar's Head deli meat plant at the center of a deadly Listeria outbreak last year will be fit to reopen after recent inspections at three other Boar's Head facilities turned up similarly alarming sanitation problems—including mold, condensation on ceilings, overflowing trash, meat residue caked onto equipment and walls, and employees failing to wash their hands. In a letter dated September 15, Rep. Rosa DeLauro (D-Conn.) and nine other Congress members noted reports that Boar's Head plans to reopen the Jarratt, Virginia, facility in the coming months. The plant—and particularly the liverwurst product made there—was determined to be the source of a Listeria outbreak that spanned May to September of last year, sickening at least 61 people across 19 states. Source: arstechnica.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
@@ -72,8 +72,8 @@
     "tags": []
   },
   {
-    "id": "fintech:fed cuts rates in risk management move as bitcoin eyes possi:2025-09-17T18:05:37.000Z",
-    "title": "Fed Cuts Rates in 'Risk Management' Move as Bitcoin Eyes Possible Upside",
+    "id": "fintech:fed cuts rate in risk management move as bitcoin eyes possib:2025-09-17T18:05:37.000Z",
+    "title": "Fed Cuts Rate in 'Risk Management' Move as Bitcoin Eyes Possible Upside",
     "url": "https://www.coindesk.com/markets/2025/09/16/fed-cuts-fed-fund-rate-by-25-basis-points-in-first-reduction-since-december",
     "category_id": "fintech",
     "region": "Global",
