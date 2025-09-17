@@ -1,26 +1,26 @@
 [
   {
-    "id": "bigtech:when will jaguar land rover restart production no one actual:2025-09-16T13:51:10.000Z",
-    "title": "When will Jaguar Land Rover restart production? “No one actually knows.”",
-    "url": "https://arstechnica.com/cars/2025/09/when-will-jaguar-land-rover-restart-production-no-one-actually-knows/",
+    "id": "bigtech:a record supply load wont reach the international space stat:2025-09-16T23:13:28.000Z",
+    "title": "A record supply load won’t reach the International Space Station as scheduled",
+    "url": "https://arstechnica.com/space/2025/09/a-record-supply-load-wont-reach-the-international-space-station-as-scheduled/",
     "category_id": "bigtech",
     "region": "Global",
     "source": "arstechnica.com",
-    "author": "\n                    Kana Inagaki, Financial Times\n                ",
-    "published_at": "2025-09-16T13:51:10.000Z",
-    "summary_long": "Jaguar Land Rover’s dealers and suppliers fear the British carmaker’s operations will take another few months to normalize after a cyber attack that experts estimate could wipe more than £3.5 billion off its revenue. JLR, which is owned by India’s Tata Motors, had been forced to shut down its systems and halt production across its UK factories since August 31, wreaking havoc across the country’s vast supply chain involving roughly 200,000 workers. JLR on Tuesday said it would extend its production halt until at least next Wednesday as it continued its investigation. In a statement, the company also cautioned that “the controlled restart of our global operations… will take time.” Read full article Comments Source: arstechnica.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "author": "\n                    Stephen Clark\n                ",
+    "published_at": "2025-09-16T23:13:28.000Z",
+    "summary_long": "A problem with the main engine on Northrop Grumman's Cygnus XL spacecraft will keep it from delivering 11,000 pounds of supplies and experiments to the International Space Station as scheduled on Wednesday. In a statement released Tuesday afternoon, NASA said ground teams are evaluating backup plans that might still allow the Cygnus spacecraft to reach the space station, just not on schedule. The problem arose early Tuesday when the spacecraft's main engine shut down earlier than expected during two burns to boost the ship's orbit for its rendezvous with the ISS, according to NASA. Officials didn't release any other details about the engine problem, but all other systems on the Cygnus XL spacecraft are performing as designed, NASA said. Source: arstechnica.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
-    "id": "bigtech:meta created its own super pac to politically kneecap its ai:2025-09-16T15:09:18.000Z",
-    "title": "Meta created its own super PAC to politically kneecap its AI rivals",
-    "url": "https://www.theverge.com/ai-artificial-intelligence/778767/meta-mark-zuckerberg-super-pac-kneecap-ai-rivals-california",
+    "id": "bigtech:chatgpt may soon require id verification from adults ceo say:2025-09-16T20:09:22.000Z",
+    "title": "ChatGPT may soon require ID verification from adults, CEO says",
+    "url": "https://arstechnica.com/ai/2025/09/chatgpt-may-soon-require-id-verification-from-adults-ceo-says/",
     "category_id": "bigtech",
     "region": "Global",
-    "source": "www.theverge.com",
-    "author": "Hayden Field",
-    "published_at": "2025-09-16T15:09:18.000Z",
-    "summary_long": "In late August, two pro-AI super PACs were announced on the same day, intent on shaping the upcoming midterm elections. One was a fairly traditional super PAC, announced via a splashy press release, with multiple major industry players planning to donate over $100 million to boost AI-friendly candidates across the country. The other was far more unusual. Meta had quietly filed to create the Mobilizing Economic Transformation Across (Meta) California, a state-only super PAC that would allow Meta to spend its own money to run political ads on behalf of their AI interests - and only their interests. Source: www.theverge.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "source": "arstechnica.com",
+    "author": "\n                    Benj Edwards\n                ",
+    "published_at": "2025-09-16T20:09:22.000Z",
+    "summary_long": "On Tuesday, OpenAI announced plans to develop an automated age-prediction system that will determine whether ChatGPT users are over or under 18, automatically directing younger users to a restricted version of the AI chatbot. The company also confirmed that parental controls will launch by the end of September. In a companion blog post, OpenAI CEO Sam Altman acknowledged the company is explicitly \"prioritizing safety ahead of privacy and freedom for teens,\" even though it means that adults may eventually need to verify their age to use a more unrestricted version of the service. \"In some cases or countries we may also ask for an ID,\" Altman wrote. Source: arstechnica.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
@@ -36,15 +36,15 @@
     "tags": []
   },
   {
-    "id": "bigtech:northrop grummans new spacecraft is a real chonker:2025-09-15T22:22:53.000Z",
-    "title": "Northrop Grumman’s new spacecraft is a real chonker",
-    "url": "https://arstechnica.com/space/2025/09/northrop-grummans-new-spacecraft-is-a-real-chonker/",
+    "id": "bigtech:waymo gets green light for airport service in san francisco:2025-09-16T18:18:14.000Z",
+    "title": "Waymo gets green light for airport service in San Francisco",
+    "url": "https://www.theverge.com/news/779039/waymo-sfo-airport-permit-robotaxi",
     "category_id": "bigtech",
     "region": "Global",
-    "source": "arstechnica.com",
-    "author": "\n                    Stephen Clark\n                ",
-    "published_at": "2025-09-15T22:22:53.000Z",
-    "summary_long": "What happens when you use a SpaceX Falcon 9 rocket to launch Northrop Grumman's Cygnus supply ship? A record-setting resupply mission to the International Space Station. The first flight of Northrop's upgraded Cygnus spacecraft, called Cygnus XL, is on its way to the international research lab after launching Sunday evening from Cape Canaveral Space Force Station, Florida. This mission, known as NG-23, is set to arrive at the ISS early Wednesday with 10,827 pounds (4,911 kilograms) of cargo to sustain the lab and its seven-person crew. Source: arstechnica.com. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "source": "www.theverge.com",
+    "author": "Andrew J. Hawkins",
+    "published_at": "2025-09-16T18:18:14.000Z",
+    "summary_long": "Waymo is now permitted to test its robotaxi service at San Francisco International Airport (SFO), a big win for the company as it seeks to expand its service area and tackle more popular, revenue-generating destinations. After years of back-and-forth negotiations, Waymo signed “Testing and Operations Pilot Permit” with SFO, San Francisco Mayor Daniel Lurie said in a release. Under the agreement, Waymo will roll out its service to SFO in three phases, including testing vehicles with a human driver, testing without a driver, and eventually beginning commercial service. Waymo will start its tests with employees before eventually inviting members of the public to take trips to and from the airport. Source: www.theverge.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
@@ -72,15 +72,51 @@
     "tags": []
   },
   {
-    "id": "fintech:orqo debuts in abu dhabi with 370m in aum sets sight on ripp:2025-09-16T10:00:00.000Z",
-    "title": "ORQO Debuts in Abu Dhabi With $370M in AUM, Sets Sight on Ripple USD Yield",
-    "url": "https://www.coindesk.com/business/2025/09/16/orqo-launches-usd370m-abu-dhabi-asset-manager-plans-yield-platform-for-ripple-s-rlusd",
+    "id": "ai_data:qdflow a python package for physics simulations of quantum d:2025-09-16T17:54:25.000Z",
+    "title": "QDFlow: A Python package for physics simulations of quantum dot devices",
+    "url": "http://arxiv.org/abs/2509.13298v1",
+    "category_id": "ai_data",
+    "region": "Global",
+    "source": "arxiv.org",
+    "author": "Donovan L. Buterakos",
+    "published_at": "2025-09-16T17:54:25.000Z",
+    "summary_long": "Recent advances in machine learning (ML) have accelerated progress in calibrating and operating quantum dot (QD) devices. However, most ML approaches rely on access to large, high-quality labeled datasets for training, benchmarking, and validation, with labels capturing key features in the data. Obtaining such datasets experimentally is challenging due to limited data availability and the labor-intensive nature of labeling. QDFlow is an open-source physics simulator for multi-QD arrays that generates realistic synthetic data with ground-truth labels. Source: arxiv.org. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "ai_data:covariance filters and neural networks over hilbert spaces:2025-09-16T15:32:30.000Z",
+    "title": "CoVariance Filters and Neural Networks over Hilbert Spaces",
+    "url": "http://arxiv.org/abs/2509.13178v1",
+    "category_id": "ai_data",
+    "region": "Global",
+    "source": "arxiv.org",
+    "author": "Claudio Battiloro",
+    "published_at": "2025-09-16T15:32:30.000Z",
+    "summary_long": "CoVariance Neural Networks (VNNs) perform graph convolutions on the empirical covariance matrix of signals defined over finite-dimensional Hilbert spaces, motivated by robustness and transferability properties. Yet, little is known about how these arguments extend to infinite-dimensional Hilbert spaces. In this work, we take a first step by introducing a novel convolutional learning framework for signals defined over infinite-dimensional Hilbert spaces, centered on the (empirical) covariance operator. We constructively define Hilbert coVariance Filters (HVFs) and design Hilbert coVariance Networks (HVNs) as stacks of HVF filterbanks with nonlinear activations. Source: arxiv.org. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "fintech:sui jumps nearly 4 after google selects it as launch partner:2025-09-16T21:05:21.000Z",
+    "title": "Sui Jumps Nearly 4% After Google Selects It as Launch Partner for AI Payments Protocol",
+    "url": "https://www.coindesk.com/markets/2025/09/16/sui-jumps-4-after-google-selects-it-as-launch-partner-for-ai-payments-protocol",
     "category_id": "fintech",
     "region": "Global",
     "source": "www.coindesk.com",
-    "author": "Krisztian Sandor",
-    "published_at": "2025-09-16T10:00:00.000Z",
-    "summary_long": "ORQO Group, a new institutional asset manager with $370 million in assets under management, has launched on Tuesday with plans to build out a yield platform for Ripple’s RLUSD stablecoin. The group, headquartered in Abu Dhabi, consolidates four entities from both traditional finance and digital assets: Mount TFI, a private debt specialist and licensed fund manager in Poland, Monterra Capital, a multi-strategy digital hedge fund in Malta, blockchain engineering studio Nextrope and decentralized finance (DeFi) protocol Soil compliant with MiCA, the EU's crypto framework. Already licensed in Poland and Malta, the group is seeking approval from the Financial Services Regulatory Authority at Abu Dhabi Global Market to expand services in the Middle East, a region it sees as a hub for regulated digital asset growth. \"It's an opportunity to become a global on-chain asset manager,\" ORQO CEO Nicholas Motz said in an interview with CoinDesk. Source: www.coindesk.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society.",
+    "author": "CD Analytics",
+    "published_at": "2025-09-16T21:05:21.000Z",
+    "summary_long": "Sui (SUI) rose nearly 4% over the past 24 hours after being selected as a launch partner for Google’s new Agentic Payments Protocol (AP2), a standard designed to let AI agents conduct financial transactions for users. The token’s move from $3.509 to $3.622 marked a 3.22% gain, with trading spanning a $0.183 range. By contrast, the CoinDesk 20 index rose just 1% over the same period. SUI is currently trading at $3.63. Source: www.coindesk.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
+    "tags": []
+  },
+  {
+    "id": "space:nasa partners push forward with remotely piloted airspace in:2025-09-16T18:43:39.000Z",
+    "title": "NASA, Partners Push Forward with Remotely Piloted Airspace Integration",
+    "url": "https://www.nasa.gov/aeronautics/nasa-partners-push-forward-with-remotely-piloted-airspace-integration/",
+    "category_id": "space",
+    "region": "Global",
+    "source": "www.nasa.gov",
+    "author": "Hillary Smith",
+    "published_at": "2025-09-16T18:43:39.000Z",
+    "summary_long": "NASA researchers Matt Gregory, right, Arwa Awiess, center, and Andrew Guion, left, discuss live flight data being ingested at the Mission Visualization and Research Control Center (MVRCC) at NASA’s Ames Research Center in California’s Silicon Valley on Aug. 21, 2025. NASA/ Brandon Torres-Navarrete NASA and its partners recently tested a tool for remotely piloted operations that could enable operators to transport people and goods more efficiently within urban areas. The team’s goal is to ensure that when these remotely piloted aircraft – including electric vertical takeoff and landing vehicles (eVTOLs) – take to the skies, air traffic controllers won’t be overburdened by increased flight operations and safety is maintained across the national airspace. Source: www.nasa.gov. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   },
   {
@@ -105,42 +141,6 @@
     "author": "Lawrence Bonk",
     "published_at": "2025-09-16T15:33:41.000Z",
     "summary_long": "YouTube held an event today aimed at creators and announced all kinds of new tools, many of which include AI in one way or another. Let's get into some of the more interesting drops. There's an AI tool that can automatically edit raw footage into a \"compelling first draft.\" It'll create a video complete with \"music, transitions and voiceover.\" It's being tested right now and should roll out in the coming weeks. The platform is also launching software that will automatically create voiceovers in English and Hindi. Source: www.engadget.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "ai_data:building towards age prediction:2025-09-16T06:00:00.000Z",
-    "title": "Building towards age prediction",
-    "url": "https://openai.com/index/building-towards-age-prediction",
-    "category_id": "ai_data",
-    "region": "Global",
-    "source": "openai.com",
-    "author": "",
-    "published_at": "2025-09-16T06:00:00.000Z",
-    "summary_long": "Building towards age prediction Source: openai.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "nextfrontiers:nvidia says complies with law after china antitrust finding:2025-09-16T08:30:01.000Z",
-    "title": "Nvidia says complies with law after China antitrust finding",
-    "url": "https://techxplore.com/news/2025-09-nvidia-complies-law-china-antitrust.html",
-    "category_id": "nextfrontiers",
-    "region": "Global",
-    "source": "techxplore.com",
-    "author": "",
-    "published_at": "2025-09-16T08:30:01.000Z",
-    "summary_long": "Nvidia says complies with law after China antitrust finding Source: techxplore.com. Date: 2025-09-16. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
-    "tags": []
-  },
-  {
-    "id": "space:nasa sets launch coverage for space weather missions:2025-09-15T21:29:53.000Z",
-    "title": "NASA Sets Launch Coverage for Space Weather Missions",
-    "url": "https://www.nasa.gov/news-release/nasa-sets-launch-coverage-for-space-weather-missions/",
-    "category_id": "space",
-    "region": "Global",
-    "source": "www.nasa.gov",
-    "author": "Jessica Taveau",
-    "published_at": "2025-09-15T21:29:53.000Z",
-    "summary_long": "From left to right, NASA’s Carruthers Geocorona Observatory, IMAP (Interstellar Mapping and Acceleration Probe), and the National Oceanic and Atmospheric Administration’s (NOAA) Space Weather Follow On-Lagrange 1 (SWFO-L1) missions will map our Sun’s influence across the solar system in new ways. Credit: NASA NASA will provide live coverage of prelaunch and launch activities for an observatory designed to study space weather and explore and map the boundaries of our solar neighborhood. Launching with IMAP (Interstellar Mapping and Acceleration Probe) are two rideshare missions, NASA’s Carruthers Geocorona Observatory and the National Oceanic and Atmospheric Administration’s (NOAA) Space Weather Follow On-Lagrange 1 (SWFO-L1), both of which will provide insight into space weather and its impacts at Earth and across the solar system. Liftoff of the missions on a SpaceX Falcon 9 rocket is targeted for 7:32 a.m. Source: www.nasa.gov. Date: 2025-09-15. Why it matters: outline likely impact on technology, business, or society. What’s next: note near-term developments or signals to watch.",
     "tags": []
   }
 ]
